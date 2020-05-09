@@ -1,7 +1,7 @@
 encoding: utf-8
 locale: en-US
-title: Alex Oswald
-subtitle: A programmers blog
+title: Alex's Blog
+subtitle: Programming adventures
 email: alex@oswaldtechnologies.com
 description: >- # this means to ignore newlines until "baseurl:"
   My adventures in programming
@@ -14,8 +14,10 @@ plugins:
   - jekyll-feed
 
 minimal_mistakes_skin: "dark"
-#words_per_minute: 50
 search: true
+search_full_content: true
+
+include: ["_pages"]
 
 defaults:
   # _posts
@@ -25,8 +27,8 @@ defaults:
     values:
       layout: single
       author_profile: true
-      #read_time: true
-      classes: wide
+      read_time: true
+      #classes: wide
   # _pages
   - scope:
       path: ""
@@ -39,7 +41,7 @@ defaults:
 author:
   name: "Alex Oswald"
   avatar: "/assets/default-profile.png"
-  bio: "Automation Engineer and coding."
+  bio: "Automation Engineer and .NET fanatic."
   location: "Bellevue, WA"
   links:
     - label: "GitHub"
