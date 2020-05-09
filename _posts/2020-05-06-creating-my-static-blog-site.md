@@ -1,5 +1,5 @@
 ---
-layout: post
+author: Alex Oswald
 title:  "Creating my static blog site!"
 date:   2020-05-06
 ---
