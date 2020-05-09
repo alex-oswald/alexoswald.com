@@ -1,11 +1,53 @@
-title: Alex's Blog
+encoding: utf-8
+locale: en-US
+title: Alex Oswald
+subtitle: A programmers blog
 email: alex@oswaldtechnologies.com
 description: >- # this means to ignore newlines until "baseurl:"
   My adventures in programming
-baseurl: ""
-url: "http://alexoswald.com"
+url: "https://www.alexoswald.com"
 
 # Build settings
-theme: minima
+#theme: minima
+theme: minimal-mistakes-jekyll
 plugins:
   - jekyll-feed
+
+minimal_mistakes_skin: "dark"
+#words_per_minute: 50
+search: true
+
+defaults:
+  # _posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      #read_time: true
+      classes: wide
+  # _pages
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: true
+      classes: wide
+
+author:
+  name: "Alex Oswald"
+  avatar: "/assets/default-profile.png"
+  bio: "Automation Engineer and coding."
+  location: "Bellevue, WA"
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/oswaldtech"
+
+footer:
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/oswaldtech"
