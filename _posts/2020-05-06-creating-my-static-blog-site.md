@@ -8,41 +8,42 @@ words_per_minute: 50
 I've always wanted to create my own blog to share my solutions to different coding problems I've solved over the years. I've finally gotten around to creating one.
 After reading a few other developer blog posts I was able to get a solution working for me that I was happy with.
 
-I started with a few requirements.
+I started with a few requirements:
 
-- Static site: I wanted to use a static site generator with Markdown.
-- Custom domain: My blog needs to be at alexoswald.com
-- Fast!
-- Cheap!
-
-
-
-### My requirements
-
-- Use Azure DevOps for version control and CI/CD
-- Use Azure storage's static website feature
-- Static site generator
+- Static site generator with Markdown support
 - Custom domain
+- Fast & secure
+- Cheap, less than $50 per year
 
-### References
+Another few requirements regarding personal preferences:
 
-List of other developer blog posts that helped me complete this project.
+- Azure DevOps for version control
+- Azure Pipelines
+- Blog deployed in Azure
 
-- [https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/](https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/)
-- [https://www.glennprince.com/article/moving-my-site-onto-a-cdn/](https://www.glennprince.com/article/moving-my-site-onto-a-cdn/)
-- [https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version](https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version)
+
 
 ---
+
+### Prerequisites
+
+1. Azure subscription
+
+2. Custom domain
+
+3. 
 
 ### Setup storage account in Azure
 
 1. Create a storage account in Azure
 
-2. Enable the Static website as shows in **Figure 1**. Write down the `Primary endpoint`. You will need it later.
+2. Enable the Static website as shown below.
 
-{% include figure image_path="/assets/storage-static-website.PNG" alt="this is a placeholder image" caption="Figure 1: Storage account static website" %}
+![Storage-static-website](/assets/storage-static-website.png)
 
+Write down the `Primary endpoint`. You will need it later.
 
+---
 
 ### Create and publish static site
 
@@ -76,7 +77,7 @@ List of other developer blog posts that helped me complete this project.
 
 7. View your published static site using the `Primary endpoint`.
 
-
+---
 
 ### Configure Azure CDN to enforce HTTPS & setup custom domains
 
@@ -87,27 +88,57 @@ Now we need to configure Azure CDN to enforce HTTPS, and setup custom domains.
 - Redirect alexoswald.com to www.alexoswald.com
 - HTTP redirected to HTTPS
 
+---
 
+### Setup special HTTP rules for the CDN endpoint
 
-### Setup special HTTP rules for the CDN
-
-
-
-### Releasing a build to the static site container
+It is no longer possible to use Azure CDN's free certificates with an apex/root domain.
 
 ![Screenshot](/assets/cdn-fail-adding-https-to-root.png)
 
+Change text to lowercase.
+
 ![Screenshot](/assets/change-to-lowercase.PNG)
+
+DNS record.
 
 ![Screenshot](/assets/dns-record-cdnverify.PNG)
 
+HSTS Header
+
 ![Screenshot](/assets/hsts-header.PNG)
+
+HTTP to HTTPS Redirect
 
 ![Screenshot](/assets/http-to-https-redirect.PNG)
 
+Redirect Root to WWW
+
+**DID NOT WORK FOR ME**
+
+I had to use GoDaddy to forward the domain to the www subdomain, which was mapped to the Azure CDN endpoint.
+
 ![Screenshot](/assets/redirect-root-to-www.PNG)
 
+---
 
+### Releasing a build to the static site container
+
+
+
+---
+
+### Site urls
+
+http://alexoswald.com - Redirected to Origin with GoDaddy domain forwarding
+
+https://alexoswald.com - 
+
+http://www.alexoswald.com - Redirected to Origin with CDN HTTP rule
+
+https://www.alexoswald.com - Origin
+
+---
 
 ### DevOps Code
 
@@ -177,3 +208,13 @@ steps:
     inlineScript: 'az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --auth-mode key --account-key $(key)'
     workingDirectory: '$(System.DefaultWorkingDirectory)/_MyBlog'
 ```
+
+---
+
+### References
+
+Here are some other developer blog posts that helped me complete this project.
+
+- [https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/](https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/)
+- [https://www.glennprince.com/article/moving-my-site-onto-a-cdn/](https://www.glennprince.com/article/moving-my-site-onto-a-cdn/)
+- [https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version](https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version)
