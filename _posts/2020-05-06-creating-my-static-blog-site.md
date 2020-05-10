@@ -5,6 +5,7 @@ classes: wide
 words_per_minute: 50
 ---
 
+
 I've always wanted to create my own blog to share my solutions to different coding problems I've solved over the years. I've finally gotten around to creating one.
 After reading a few other developer blog posts I was able to get a solution working for me that I was happy with.
 
@@ -22,42 +23,146 @@ Another few requirements regarding personal preferences:
 - Blog deployed in Azure
 
 
-
 ---
+
 
 ### Prerequisites
 
-1. Azure subscription
+- Azure subscription
 
-2. Custom domain
+- Azure DevOps
 
-3. 
+- Custom domain
 
-### Setup storage account in Azure
+- Visual Studio Code
 
-1. Create a storage account in Azure
+- [Install Jekyll on Windows](https://jekyllrb.com/docs/installation/windows/)
 
-2. Enable the Static website as shown below.
+  I'm not going to explain how to install Jekyll. I following their instructions and they worked fine for me.
 
-![Storage-static-website](/assets/storage-static-website.png)
-
-Write down the `Primary endpoint`. You will need it later.
 
 ---
 
-### Create and publish static site
 
-1. [Install Jekyll on Windows](https://jekyllrb.com/docs/installation/windows/)
+### Setup storage account in Azure
 
-    - Download and Install Ruby+Devkit
+**Create** a storage account in Azure
 
-2. [Create new Jekyll site in VSCode](https://jekyllrb.com/docs/)
+In the storage account, go to **Static website**. Set the `Static website`
+option to `Enabled`.
 
-3. Create project in Azure DevOps
+![Storage-static-website](/assets/images/2020-05-06/storage-static-website.png)
 
-4. Push site to DevOps from VSCode
+Write down the `Primary endpoint`. You will need it later.
 
-5. Add the `azure-piplines.yaml` file to the repo. Use this [Azure pipelines yaml](#azure-pipelines-yaml) code to build the site automatically on each push.
+
+---
+
+
+### Create project in Azure DevOps
+
+Login to your DevOps account [https://dev.azure.com/](https://dev.azure.com/).
+
+Add a new project, making sure *Version control* is set to **Git**.
+
+Navigate to **Repos** > **Files**.
+
+Now we are going to **Clone* in VS Code** for next steps
+
+
+---
+
+
+### Generate the site with Jekyll
+
+Once your repo folder is open in VS Code, lets open a Terminal window and run some commands.
+
+The first command creates the site in our repo folder.
+
+```powershell
+jekyll new ./
+```
+
+What was once an empty folder, should now be populated with the following.
+
+![jekyll-new-file-structure](/assets/images/2020-05-06/jekyll-new-file-structure.png)
+
+Now we are going to build and run the site to check it out.
+
+Run the command.
+
+```powershell
+bundle exec jekyll serve
+```
+
+You should be able to ctrl + click to open your default browser and view your site.
+
+![server-address](/assets/images/2020-05-06/server-address.png)
+
+
+---
+
+
+### Create a build pipeline
+
+We are going to create a build pipeline in Azure DevOps so the site is built each time a push is made to the master or a tag is created. The built site is stored as an Artifact and can be used in other pipelines.
+
+Navigate to **Pipelines** > **Pipelines** and click **Create Pipeline**.
+
+![create-build-pipeline1](/assets/images/2020-05-06/create-build-pipeline1.png)
+
+You will be asked where your code is. Select **Azure Repos Git**.
+
+![create-build-pipeline2](/assets/images/2020-05-06/create-build-pipeline2.png)
+
+Then select your repository.
+
+![create-build-pipeline3](/assets/images/2020-05-06/create-build-pipeline3.png)
+
+We are going to wipe out the example yaml file so you can select **Ruby** or **Starter pipeline**.
+
+![create-build-pipeline4](/assets/images/2020-05-06/create-build-pipeline4.png)
+
+I picked the **Starter pipeline**. Now replace it all with this [Azure pipelines yaml](#azure-pipelines-yaml) code.
+
+![create-build-pipeline5](/assets/images/2020-05-06/create-build-pipeline5.png)
+
+Click **Save and run**, specify commit message and options, then click **Save and run** again.
+
+Lets let the job run and wait for the result.
+
+
+---
+
+
+### Create a Release Pipeline
+
+Our site is built and stored in DevOps as an Artifact waiting to be deployed.
+
+Navigate to **Pipelines** > **Releases** and click **New pipeline**.
+
+![create-release-pipeline1](/assets/images/2020-05-06/create-release-pipeline1.png)
+
+Select **Empty job**
+
+![create-release-pipeline2](/assets/images/2020-05-06/create-release-pipeline2.png)
+
+**Save** the pipeline.
+
+![create-release-pipeline3](/assets/images/2020-05-06/create-release-pipeline3.png)
+
+Click **Add an artifact**. Choose *Build* and select your *Project* and build pipeline we created previously as the *Source*. Click **Add**.
+
+![create-release-pipeline4](/assets/images/2020-05-06/create-release-pipeline4.png)
+
+We have now added the artifact so it can be used by the pipeline. Under *Stage 1*, click **1 job, 0 task**.
+
+![create-release-pipeline5](/assets/images/2020-05-06/create-release-pipeline5.png)
+
+
+
+
+
 
 6. Create a Release Pipeline.
 
@@ -79,6 +184,7 @@ Write down the `Primary endpoint`. You will need it later.
 
 ---
 
+
 ### Configure Azure CDN to enforce HTTPS & setup custom domains
 
 Now we need to configure Azure CDN to enforce HTTPS, and setup custom domains.
@@ -88,29 +194,31 @@ Now we need to configure Azure CDN to enforce HTTPS, and setup custom domains.
 - Redirect alexoswald.com to www.alexoswald.com
 - HTTP redirected to HTTPS
 
+
 ---
+
 
 ### Setup special HTTP rules for the CDN endpoint
 
 It is no longer possible to use Azure CDN's free certificates with an apex/root domain.
 
-![Screenshot](/assets/cdn-fail-adding-https-to-root.png)
+![Screenshot](/assets/images/2020-05-06/cdn-fail-adding-https-to-root.png)
 
 Change text to lowercase.
 
-![Screenshot](/assets/change-to-lowercase.PNG)
+![Screenshot](/assets/images/2020-05-06/change-to-lowercase.png)
 
 DNS record.
 
-![Screenshot](/assets/dns-record-cdnverify.PNG)
+![Screenshot](/assets/images/2020-05-06/dns-record-cdnverify.PNG)
 
 HSTS Header
 
-![Screenshot](/assets/hsts-header.PNG)
+![Screenshot](/assets/images/2020-05-06/hsts-header.png)
 
 HTTP to HTTPS Redirect
 
-![Screenshot](/assets/http-to-https-redirect.PNG)
+![Screenshot](/assets/images/2020-05-06/http-to-https-redirect.png)
 
 Redirect Root to WWW
 
@@ -118,15 +226,18 @@ Redirect Root to WWW
 
 I had to use GoDaddy to forward the domain to the www subdomain, which was mapped to the Azure CDN endpoint.
 
-![Screenshot](/assets/redirect-root-to-www.PNG)
+![Screenshot](/assets/images/2020-05-06/redirect-root-to-www.png)
+
 
 ---
+
 
 ### Releasing a build to the static site container
 
 
 
 ---
+
 
 ### Site urls
 
@@ -138,7 +249,9 @@ http://www.alexoswald.com - Redirected to Origin with CDN HTTP rule
 
 https://www.alexoswald.com - Origin
 
+
 ---
+
 
 ### DevOps Code
 
@@ -209,7 +322,9 @@ steps:
     workingDirectory: '$(System.DefaultWorkingDirectory)/_MyBlog'
 ```
 
+
 ---
+
 
 ### References
 
