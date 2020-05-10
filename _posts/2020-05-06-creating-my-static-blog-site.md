@@ -67,7 +67,7 @@ Add a new project, making sure *Version control* is set to **Git**.
 
 Navigate to **Repos** > **Files**.
 
-Now we are going to **Clone* in VS Code** for next steps
+Now we are going to **Clone in VS Code** for next steps
 
 
 ---
@@ -147,11 +147,11 @@ Select **Empty job**
 
 ![create-release-pipeline2](/assets/images/2020-05-06/create-release-pipeline2.png)
 
-**Save** the pipeline.
+Click **X** to close the Stage pane.
 
 ![create-release-pipeline3](/assets/images/2020-05-06/create-release-pipeline3.png)
 
-Click **Add an artifact**. Choose *Build* and select your *Project* and build pipeline we created previously as the *Source*. Click **Add**.
+Click **Add an artifact**. Choose *Build*, select your *Project*, then select the build pipeline we created previously as the *Source*. Click **Add**.
 
 ![create-release-pipeline4](/assets/images/2020-05-06/create-release-pipeline4.png)
 
