@@ -40,7 +40,7 @@ defaults:
 
 author:
   name: "Alex Oswald"
-  avatar: "/assets/default-profile.png"
+  avatar: "/assets/images/default-profile.png"
   bio: "Automation Engineer and .NET fanatic."
   location: "Bellevue, WA"
   links:
