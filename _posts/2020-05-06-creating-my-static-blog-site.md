@@ -137,7 +137,7 @@ Lets let the job run and wait for the result.
 
 ### Create a Release Pipeline
 
-Our site is built and stored in DevOps as an Artifact waiting to be deployed.
+Our site is built and stored in DevOps as an Artifact, waiting to be deployed.
 
 Navigate to **Pipelines** > **Releases** and click **New pipeline**.
 
@@ -151,43 +151,102 @@ Click **X** to close the Stage pane.
 
 ![create-release-pipeline3](/assets/images/2020-05-06/create-release-pipeline3.png)
 
-Click **Add an artifact**. Choose *Build*, select your *Project*, then select the build pipeline we created previously as the *Source*. Click **Add**.
+Click **Add an artifact**.
+
+Choose *Build*, select your *Project*, then select the build pipeline we created previously as the *Source*. Click **Add**.
 
 ![create-release-pipeline4](/assets/images/2020-05-06/create-release-pipeline4.png)
 
-We have now added the artifact so it can be used by the pipeline. Under *Stage 1*, click **1 job, 0 task**.
+We have now added the artifact so it can be used by the pipeline.
+
+Under *Stage 1*, click **1 job, 0 task**.
 
 ![create-release-pipeline5](/assets/images/2020-05-06/create-release-pipeline5.png)
 
+#### Add tasks
+
+We have two new tasks to add.
+
+1. The first is to Sync the files in the Artifact with your static website container in the Azure Storage account specified. Click the **+** to add a new task.
+
+![create-release-pipeline6](/assets/images/2020-05-06/create-release-pipeline6.png)
+
+Add an `Azure CLI` task.
+
+![create-release-pipeline7](/assets/images/2020-05-06/create-release-pipeline7.png)
+
+I updated the *Display name* to **Sync files**, set my Azure subscription and changed the *Script Location* to *Inline script*. Set the inline script to the below.
+
+```powershell
+az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --auth-mode key --account-key $(key)
+```
+
+![create-release-pipeline8](/assets/images/2020-05-06/create-release-pipeline8.png)
+
+2. The second is to Purge the CDN of all cached files so the new site is pulled and cached.
+
+Add another `Azure CLI` task.
+
+I updated the *Display name* to **Purge CDN**, set my Azure subscription and changed the *Script Location* to *Inline script*. Set the inline script to the below.
+
+```powershell
+az cdn endpoint purge --profile-name $(cdnProfile) --content-paths /* --name $(endpointName) --resource-group $(resourceGroup)
+```
+
+![create-release-pipeline9](/assets/images/2020-05-06/create-release-pipeline9.png)
+
+#### Add variables
+
+Both of our tasks use multiple variables to define. While still editing Release, click **Variables**.
+
+Add the following variables:
+
+Sync files
+---
+Name | Description
+--|--
+source | Folder name in the artifact that contains the site
+containerName | $web (set by Azure)
+storageAccount | The name of your storage account
+key | Access key to your storage account
+
+Purge CDN
+---
+Name | Description
+--|--
+cdnProfile | The name of the CDN Profile used by the Endpoint resource
+endpointName | The name of the Endpoint
+resourceGroup | The name of the Resource Group that contains the Endpoint
 
 
+![create-release-pipeline10](/assets/images/2020-05-06/create-release-pipeline10.png)
 
+##### Make sure to Save your pipeline
 
+#### Create a release
 
-6. Create a Release Pipeline.
+In the top right next to the Save button you just clicked, click **Create release**, after the dialog shows, click **Create**.
 
-    - Use the build pipelines artifact.
+This process may take a few minutes. Once complete, open a browser and navigate to the storage accounts `Primary endpoint` you wrote down previously. Your site should now be deployed!
 
-    - [Sync with Azure storage yaml](#sync-yaml)
+As it stands, you can release a new version of your site by:
 
-    - Purge CDN
+1. Making changes in VS Code
+2. Commiting changes
+3. Wait for build pipeline to succeed
+4. Create release pipeline
+5. View new deployment in a browser
 
-      [Purge CDN endpoint](https://docs.microsoft.com/en-us/cli/azure/cdn/endpoint?view=azure-cli-latest#az-cdn-endpoint-purge)
-
-      ```powershell
-      az cdn endpoint purge --profile-name $(cdnProfile) --content-paths '/*' --name $(endpointName) --resource-group $(resourceGroup)
-      ```
-
-    - Create a Release to publish your site.
-
-7. View your published static site using the `Primary endpoint`.
+Our web address to access the site is currently the `Primary endpoint` for the Storage accounts web container.
 
 ---
 
 
 ### Configure Azure CDN to enforce HTTPS & setup custom domains
 
-Now we need to configure Azure CDN to enforce HTTPS, and setup custom domains.
+Now we want to utilize Azure CDN to cache the static site so it is super fast for viewers all over the world.
+
+
 
 - Either cdnverify.alexoswald or just cdnverify worked
 - Site is published to www.alexoswald.com
@@ -305,7 +364,7 @@ steps:
     ArtifactName: '_site'
 ```
 
-#### Sync yaml
+#### Sync files
 
 ```yaml
 # This code syncs with the storage blob you specify
@@ -322,6 +381,19 @@ steps:
     workingDirectory: '$(System.DefaultWorkingDirectory)/_MyBlog'
 ```
 
+#### Purge CDN
+
+```yaml
+# Purges the CDN's cache so it has to fetch new (updated)
+# content from the storage container
+steps:
+- task: AzureCLI@1
+  displayName: 'Purge CDN'
+  inputs:
+    azureSubscription: 'Visual Studio Professional (3a69699e-acaf-48c5-a4a3-d506bb04d4a6)'
+    scriptLocation: inlineScript
+    inlineScript: 'az cdn endpoint purge --profile-name $(cdnProfile) --content-paths /* --name $(endpointName) --resource-group $(resourceGroup)'
+```
 
 ---
 
