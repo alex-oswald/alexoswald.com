@@ -201,27 +201,27 @@ Both of our tasks use multiple variables to define. While still editing Release,
 
 Add the following variables:
 
-Sync files
----
-Name | Description
---|--
-source | Folder name in the artifact that contains the site
-containerName | $web (set by Azure)
-storageAccount | The name of your storage account
-key | Access key to your storage account
+**Sync files**
 
-Purge CDN
----
-Name | Description
---|--
-cdnProfile | The name of the CDN Profile used by the Endpoint resource
-endpointName | The name of the Endpoint
-resourceGroup | The name of the Resource Group that contains the Endpoint
+*source*: Folder name in the artifact that contains the site
 
+*containerName*:  $web (set by Azure)
+
+*storageAccount*:  The name of your storage account
+
+*key*: Access key to your storage account
+
+**Purge CDN**
+
+*cdnProfile*: The name of the CDN Profile used by the Endpoint resource
+
+*endpointName*: The name of the Endpoint
+
+*resourceGroup*: The name of the Resource Group that contains the Endpoint
 
 ![create-release-pipeline10](/assets/images/2020-05-06/create-release-pipeline10.png)
 
-##### Make sure to Save your pipeline
+**Make sure to Save your pipeline**
 
 #### Create a release
 
@@ -238,6 +238,7 @@ As it stands, you can release a new version of your site by:
 5. View new deployment in a browser
 
 Our web address to access the site is currently the `Primary endpoint` for the Storage accounts web container.
+
 
 ---
 
