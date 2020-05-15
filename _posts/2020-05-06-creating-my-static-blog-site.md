@@ -1,26 +1,31 @@
 ---
-title:  "Creating my static blog site!"
+title:  "Creating a Fast & Secure Blog with Jekyll, Azure Storage & Azure CDN!"
 date:   2020-05-06
-classes: wide
-words_per_minute: 50
+toc: true
+toc_table: 'Outline'
+toc_icon: list-alt
+toc_sticky: true
+#classes: wide
+#words_per_minute: 50
 ---
 
 
-I've always wanted to create my own blog to share my solutions to different coding problems I've solved over the years. I've finally gotten around to creating one.
-After reading a few other developer blog posts I was able to get a solution working for me that I was happy with.
+I've always wanted to create my own blog to share my solutions to different coding problems I've solved over the years. I've finally made time to create one.
+After reading a few other developers blog posts I was able to get a solution working for me that I was happy with.
 
 I started with a few requirements:
 
-- Static site generator with Markdown support
-- Custom domain
-- Fast & secure
-- Cheap, less than $50 per year
+- Static site generator - I wanted to use a static site generator for its simplicity and speed benefits.
+- Custom domain - I've purchased my own domain so I want to make sure I can use it for my blog.
+- Fast & secure - I want it to be super fast & be secure. Load times under 500ms would be great. I want the pages to load in the time it takes to transition with some animation.
+- Cheap, less than $50 per year - The domain is $20 a year from GoDaddy with privacy. That leaves $30 for hosting and security.
 
+I am a HUGE .NET fan and everything Microsoft related so I will most always utilize their tools.
 Another few requirements regarding personal preferences:
 
 - Azure DevOps for version control
-- Azure Pipelines
-- Blog deployed in Azure
+- Azure Pipelines for builds and release deployments (no dev deployment)
+- Deployed in Azure
 
 
 ---
@@ -32,9 +37,9 @@ Another few requirements regarding personal preferences:
 
 - Azure DevOps
 
-- Custom domain
+- Own a custom domain
 
-- Visual Studio Code
+- Visual Studio Code (or your preferred, guide uses VSC)
 
 - [Install Jekyll on Windows](https://jekyllrb.com/docs/installation/windows/)
 
@@ -232,12 +237,12 @@ This process may take a few minutes. Once complete, open a browser and navigate 
 As it stands, you can release a new version of your site by:
 
 1. Making changes in VS Code
-2. Commiting changes
+2. Committing changes
 3. Wait for build pipeline to succeed
 4. Create release pipeline
 5. View new deployment in a browser
 
-Our web address to access the site is currently the `Primary endpoint` for the Storage accounts web container.
+The web address to access the site is currently the `Primary endpoint` for the Storage accounts web container.
 
 
 ---
@@ -245,7 +250,35 @@ Our web address to access the site is currently the `Primary endpoint` for the S
 
 ### Configure Azure CDN to enforce HTTPS & setup custom domains
 
-Now we want to utilize Azure CDN to cache the static site so it is super fast for viewers all over the world.
+Now we want to utilize Azure CDN to cache the static site so it is fast & secure for viewers.
+
+>**IMPORTANT**  
+>I was able to get my apex domain added as a custom domain to my Azure CDN endpoint, but Azure no longer supports using their free SSL certificates for apex domains. I can't purchase one because it would blow my yearly budget. The option I came up with involves setting up Azure CDN using the `www` subdomain and then forwarding requests to the apex domain to the www subdomain. While I personally dislike having to use the `www` subdomain at all, it is providing me a free SSL certificate.
+
+![Screenshot](/assets/images/2020-05-06/azure-cdn-apex-https-fail.png)
+
+**Steps**
+
+1. Create Azure CDN endpoint
+3. Add CNAME for domain verification
+3. Add custom domains to the CDN endpoint
+
+#### Create Azure CDN endpoint
+
+
+
+
+#### Add CNAME for domain verification
+
+
+
+![Screenshot](/assets/images/2020-05-06/cname-records.png)
+
+#### Add custom domains to the CDN endpoint
+
+
+
+
 
 
 
@@ -260,17 +293,10 @@ Now we want to utilize Azure CDN to cache the static site so it is super fast fo
 
 ### Setup special HTTP rules for the CDN endpoint
 
-It is no longer possible to use Azure CDN's free certificates with an apex/root domain.
-
-![Screenshot](/assets/images/2020-05-06/cdn-fail-adding-https-to-root.png)
-
 Change text to lowercase.
 
 ![Screenshot](/assets/images/2020-05-06/change-to-lowercase.png)
 
-DNS record.
-
-![Screenshot](/assets/images/2020-05-06/dns-record-cdnverify.PNG)
 
 HSTS Header
 
@@ -284,7 +310,7 @@ Redirect Root to WWW
 
 **DID NOT WORK FOR ME**
 
-I had to use GoDaddy to forward the domain to the www subdomain, which was mapped to the Azure CDN endpoint.
+This wasn't working for me. I had to use GoDaddy to forward the domain to the www subdomain, which was mapped to the Azure CDN endpoint.
 
 ![Screenshot](/assets/images/2020-05-06/redirect-root-to-www.png)
 

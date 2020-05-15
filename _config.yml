@@ -27,8 +27,6 @@ defaults:
     values:
       layout: single
       author_profile: true
-      read_time: true
-      #classes: wide
   # _pages
   - scope:
       path: ""
@@ -36,7 +34,6 @@ defaults:
     values:
       layout: single
       author_profile: true
-      classes: wide
 
 author:
   name: "Alex Oswald"
