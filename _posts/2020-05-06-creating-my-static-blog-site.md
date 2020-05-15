@@ -2,11 +2,9 @@
 title:  "Creating a Fast & Secure Blog with Jekyll, Azure Storage & Azure CDN!"
 date:   2020-05-06
 toc: true
-toc_table: 'Outline'
+toc_label: 'Outline'
 toc_icon: list-alt
 toc_sticky: true
-#classes: wide
-#words_per_minute: 50
 ---
 
 
@@ -49,14 +47,20 @@ Another few requirements regarding personal preferences:
 ---
 
 
-### Setup storage account in Azure
+### 1. Setup storage account in Azure
 
 **Create** a storage account in Azure
+
+![create-storage-account](/assets/images/2020-05-06/create-storage-account.png)
 
 In the storage account, go to **Static website**. Set the `Static website`
 option to `Enabled`.
 
-![Storage-static-website](/assets/images/2020-05-06/storage-static-website.png)
+![storage-static-website-enable](/assets/images/2020-05-06/storage-static-website-enable.png)
+
+**Save** the change.
+
+![storage-static-website](/assets/images/2020-05-06/storage-static-website.png)
 
 Write down the `Primary endpoint`. You will need it later.
 
@@ -64,7 +68,7 @@ Write down the `Primary endpoint`. You will need it later.
 ---
 
 
-### Create project in Azure DevOps
+### 2. Create project in Azure DevOps
 
 Login to your DevOps account [https://dev.azure.com/](https://dev.azure.com/).
 
@@ -78,7 +82,7 @@ Now we are going to **Clone in VS Code** for next steps
 ---
 
 
-### Generate the site with Jekyll
+### 3. Generate the site with Jekyll
 
 Once your repo folder is open in VS Code, lets open a Terminal window and run some commands.
 
@@ -108,7 +112,7 @@ You should be able to ctrl + click to open your default browser and view your si
 ---
 
 
-### Create a build pipeline
+### 4. Create a build pipeline
 
 We are going to create a build pipeline in Azure DevOps so the site is built each time a push is made to the master or a tag is created. The built site is stored as an Artifact and can be used in other pipelines.
 
@@ -140,7 +144,7 @@ Lets let the job run and wait for the result.
 ---
 
 
-### Create a Release Pipeline
+### 5. Create a Release Pipeline
 
 Our site is built and stored in DevOps as an Artifact, waiting to be deployed.
 
@@ -248,31 +252,40 @@ The web address to access the site is currently the `Primary endpoint` for the S
 ---
 
 
-### Configure Azure CDN to enforce HTTPS & setup custom domains
+### 6. Configure Azure CDN to enforce HTTPS & setup custom domains
 
 Now we want to utilize Azure CDN to cache the static site so it is fast & secure for viewers.
 
 >**IMPORTANT**  
 >I was able to get my apex domain added as a custom domain to my Azure CDN endpoint, but Azure no longer supports using their free SSL certificates for apex domains. I can't purchase one because it would blow my yearly budget. The option I came up with involves setting up Azure CDN using the `www` subdomain and then forwarding requests to the apex domain to the www subdomain. While I personally dislike having to use the `www` subdomain at all, it is providing me a free SSL certificate.
 
-![Screenshot](/assets/images/2020-05-06/azure-cdn-apex-https-fail.png)
-
-**Steps**
-
-1. Create Azure CDN endpoint
-3. Add CNAME for domain verification
-3. Add custom domains to the CDN endpoint
+![azure-cdn-apex-https-fail](/assets/images/2020-05-06/azure-cdn-apex-https-fail.png)
 
 #### Create Azure CDN endpoint
+
+While viewing the storage account resource, under **Blob service**, go to **Azure CDN**.
+
+From here, we are going to create a new `Endpoint`.
+
+Create a new **CDN profile** with the name of your choosing.
+
+Make sure the **Pricing tier** is set to *Premium Version* so we can set HTTP rules later.
+
+Enter the **CDN endpoint name**.
+
+Click **Create**.
+
+![create-azure-cdn-endpoint](/assets/images/2020-05-06/create-azure-cdn-endpoint.png)
+
 
 
 
 
 #### Add CNAME for domain verification
 
+In order to setup our custom domains Azure needs to verify you own the domain so we need to setup some CNAME records that Azure can verify.
 
-
-![Screenshot](/assets/images/2020-05-06/cname-records.png)
+![cname-records](/assets/images/2020-05-06/cname-records.png)
 
 #### Add custom domains to the CDN endpoint
 
@@ -291,7 +304,7 @@ Now we want to utilize Azure CDN to cache the static site so it is fast & secure
 ---
 
 
-### Setup special HTTP rules for the CDN endpoint
+### 7. Setup special HTTP rules for the CDN endpoint
 
 Change text to lowercase.
 
@@ -318,14 +331,16 @@ This wasn't working for me. I had to use GoDaddy to forward the domain to the ww
 ---
 
 
-### Releasing a build to the static site container
+### 8. Releasing a build to the static site container
 
 
 
 ---
 
+### Appendixes
 
-### Site urls
+
+#### Appendix A: Site urls
 
 http://alexoswald.com - Redirected to Origin with GoDaddy domain forwarding
 
@@ -336,12 +351,9 @@ http://www.alexoswald.com - Redirected to Origin with CDN HTTP rule
 https://www.alexoswald.com - Origin
 
 
----
+#### Appendix B: DevOps Code
 
-
-### DevOps Code
-
-#### Azure pipelines yaml
+##### Azure pipelines yaml
 
 `azure-pipelines.yaml`
 
@@ -391,7 +403,7 @@ steps:
     ArtifactName: '_site'
 ```
 
-#### Sync files
+##### Sync files
 
 ```yaml
 # This code syncs with the storage blob you specify
@@ -408,7 +420,7 @@ steps:
     workingDirectory: '$(System.DefaultWorkingDirectory)/_MyBlog'
 ```
 
-#### Purge CDN
+##### Purge CDN
 
 ```yaml
 # Purges the CDN's cache so it has to fetch new (updated)
@@ -425,7 +437,7 @@ steps:
 ---
 
 
-### References
+#### Appendix C: References
 
 Here are some other developer blog posts that helped me complete this project.
 
