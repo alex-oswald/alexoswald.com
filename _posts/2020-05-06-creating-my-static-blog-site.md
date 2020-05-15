@@ -277,28 +277,50 @@ Click **Create**.
 
 ![create-azure-cdn-endpoint](/assets/images/2020-05-06/create-azure-cdn-endpoint.png)
 
+Navigate to the newely created resource.
 
+Navigate to **Settings** > **Origin** and deselect **HTTP**. We only want to allow HTTPS.
 
+![endpoint-disable-http](/assets/images/2020-05-06/endpoint-disable-http.png)
 
-
-#### Add CNAME for domain verification
+#### Add DNS records to domain
 
 In order to setup our custom domains Azure needs to verify you own the domain so we need to setup some CNAME records that Azure can verify.
+
+Add a CNAME with **Host** `www` and **Value** `myblog-endpoint.azureedge.net`.
+
+I'm using GoDaddy for my domains.
 
 ![cname-records](/assets/images/2020-05-06/cname-records.png)
 
 #### Add custom domains to the CDN endpoint
 
+Navigate to the Azure CDN Endpoint resource.
+
+Navigate to **Settings** > **Custom domains** > **+ Custom domain**
+
+![add-custom-domain-to-endpoint](/assets/images/2020-05-06/add-custom-domain-to-endpoint.png)
+
+Fill in your `www` subdomain. If Azure is able to verify your CNAME record you will see the green check, otherwise there will be a red X.
+
+![add-a-custom-domain](/assets/images/2020-05-06/add-a-custom-domain.png)
+
+Now we need to enable HTTPS for the hostname.
+
+Click your custom domain.
+
+![endpoint-custom-domains](/assets/images/2020-05-06/endpoint-custom-domains.png)
+
+![configure-https](/assets/images/2020-05-06/configure-https.png)
 
 
 
 
+![enable-custom-domain-https](/assets/images/2020-05-06/enable-custom-domain-https.png)
+
+![godaddy-domain-forwarding](/assets/images/2020-05-06/godaddy-domain-forwarding.png)
 
 
-- Either cdnverify.alexoswald or just cdnverify worked
-- Site is published to www.alexoswald.com
-- Redirect alexoswald.com to www.alexoswald.com
-- HTTP redirected to HTTPS
 
 
 ---
