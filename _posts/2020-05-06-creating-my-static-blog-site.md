@@ -269,7 +269,7 @@ From here, we are going to create a new `Endpoint`.
 
 Create a new **CDN profile** with the name of your choosing.
 
-Make sure the **Pricing tier** is set to *Premium Version* so we can set HTTP rules later.
+Make sure the **Pricing tier** is set to *Premium Verizon* so we can set HTTP rules later.
 
 Enter the **CDN endpoint name**.
 
@@ -293,7 +293,7 @@ I'm using GoDaddy for my domains.
 
 ![cname-records](/assets/images/2020-05-06/cname-records.png)
 
-#### Add custom domains to the CDN endpoint
+#### Add custom domain to the CDN endpoint
 
 Navigate to the Azure CDN Endpoint resource.
 
@@ -311,16 +311,27 @@ Click your custom domain.
 
 ![endpoint-custom-domains](/assets/images/2020-05-06/endpoint-custom-domains.png)
 
-![configure-https](/assets/images/2020-05-06/configure-https.png)
+Set **Custom domain HTTPS** to **On**.
 
+I am using Azure's free certificates so I set **Certificate management type** to **CDN managed**.
 
-
+Then click **Save**.
 
 ![enable-custom-domain-https](/assets/images/2020-05-06/enable-custom-domain-https.png)
 
+In my experience, the certificate deployment process can take a few hours to complete.
+
+Once complete, the screen should look like the below.
+
+
+
+![https-successfully-enabled](/assets/images/2020-05-06/https-successfully-enabled.png)
+
+
+#### Complete custom domain setup
+
+
 ![godaddy-domain-forwarding](/assets/images/2020-05-06/godaddy-domain-forwarding.png)
-
-
 
 
 ---
