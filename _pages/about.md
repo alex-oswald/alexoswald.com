@@ -5,10 +5,6 @@ permalink: /about/
 classes: wide
 ---
 
-I'm Alex, and I work for Honeywell Aerospace as an Automation Engineer. My team designs, builds and maintains test hardware and software for the manufacturing tests of accelerometers.
+I'm Alex, and I currently work for the University of Washington as a Senior Applications System Engineer. I'm on the Enterprise Web Services team and we are responsible for the universities web services. Previously, I worked for Honeywell Aerospace in Redmond, WA. I was an Automation Engineer in the Advanced Manufacturing Eningeering org. The team I was on designs, builds and maintains test hardware and software for the manufacturing tests of accelerometers.
 
-I also have a side business, Oswald Technologies, LLC that provides [TireDispatcher](https://tiredispatcher.com) for commercial tire companies to keep track of their mobile services.
-
-View me on GitHub at [oswaldtech](https://github.com/oswaldtech).
-
-View Oswald Technologies, LLC on GitHub at [oswald-technologies](https://github.com/oswald-technologies)
+View me on GitHub at [alex-oswald](https://github.com/alex-oswald).
