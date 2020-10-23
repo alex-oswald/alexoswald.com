@@ -20,7 +20,7 @@ steps:
 - script: 'bundle install'
   displayName: 'Install Gems'
 
-- script: 'bundle exe jekyll build'
+- script: 'bundle exec jekyll build'
   displayName: Build
 
 - task: CopyFiles@2

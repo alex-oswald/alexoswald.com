@@ -19,6 +19,10 @@ search_full_content: true
 
 include: ["_pages"]
 
+exclude:
+  - README
+  - azure-pipelines
+
 defaults:
   # _posts
   - scope:
@@ -43,10 +47,10 @@ author:
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      url: "https://github.com/oswaldtech"
+      url: "https://github.com/alex-oswald"
 
 footer:
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
-      url: "https://github.com/oswaldtech"
+      url: "https://github.com/alex-oswald"
