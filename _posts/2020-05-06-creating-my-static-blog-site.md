@@ -1,6 +1,6 @@
 ---
-title:  "Creating a Fast & Secure Blog with Jekyll, Azure Storage & Azure CDN!"
-date:   2020-05-06
+title: "Creating a Fast & Secure Blog with Jekyll, Dev Containers & Azure CDN!"
+date: 2020-10-24
 toc: true
 toc_label: 'Outline'
 toc_icon: list-alt
@@ -15,15 +15,17 @@ I started with a few requirements:
 
 - Static site generator - I wanted to use a static site generator for its simplicity and speed benefits.
 - Custom domain - I've purchased my own domain so I want to make sure I can use it for my blog.
-- Fast & secure - I want it to be super fast & be secure. Load times under 500ms would be great. I want the pages to load in the time it takes to transition with some animation.
+- Fast & secure - I want it to be fast & be secure. Load times under 500ms would be great.
 - Cheap, less than $50 per year - The domain is $20 a year from GoDaddy with privacy. That leaves $30 for hosting and security.
 
-I am a HUGE .NET fan and everything Microsoft related so I will most always utilize their tools.
+I am a .NET fanatic and everything Microsoft related so I will most always utilize their tools.
 Another few requirements regarding personal preferences:
 
 - Azure DevOps for version control
 - Azure Pipelines for builds and release deployments (no dev deployment)
 - Deployed in Azure
+
+In this guide, we will setup Azure to host the blog via Azure CDN for speedy access. We will use Jekyll to generate our static site. Since I don't want to install Ruby or Jekyll on my computer, we will develop the site in VSCode using dev containers. With dev containers, we can develop inside a container that already has Ruby and Jekyll installed.
 
 
 ---
@@ -35,40 +37,17 @@ Another few requirements regarding personal preferences:
 
 - Azure DevOps
 
-- Own a custom domain
+- A custom domain
 
-- Visual Studio Code (or your preferred, guide uses VSC)
+- Visual Studio Code with the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
 
-- [Install Jekyll on Windows](https://jekyllrb.com/docs/installation/windows/)
-
-  I'm not going to explain how to install Jekyll. I following their instructions and they worked fine for me.
+- Docker Desktop
 
 
 ---
 
 
-### 1. Setup storage account in Azure
-
-**Create** a storage account in Azure
-
-![create-storage-account](/assets/images/2020-05-06/create-storage-account.png)
-
-In the storage account, go to **Static website**. Set the `Static website`
-option to `Enabled`.
-
-![storage-static-website-enable](/assets/images/2020-05-06/storage-static-website-enable.png)
-
-**Save** the change.
-
-![storage-static-website](/assets/images/2020-05-06/storage-static-website.png)
-
-Write down the `Primary endpoint`. You will need it later.
-
-
----
-
-
-### 2. Create project in Azure DevOps
+## Create project in Azure DevOps
 
 Login to your DevOps account [https://dev.azure.com/](https://dev.azure.com/).
 
@@ -82,95 +61,113 @@ Now we are going to **Clone in VS Code** for next steps
 ---
 
 
-### 3. Generate the site with Jekyll
+## Generate the site with Jekyll inside a Dev Container
 
-Once your repo folder is open in VS Code, lets open a Terminal window and run some commands.
+[Check out Microsoft's dev containers tutorial](https://code.visualstudio.com/docs/remote/containers-tutorial)
 
-The first command creates the site in our repo folder.
+We have an empty repo now open in VS Code. To get started, lets get our dev container running. To do this,
+open the `Command Pallete` and run the task `Remote-Contianers: Open Folder in Container`.
+
+![open-folder-dev-container](../assets/images/2020-05-06/open-folder-dev-container.png)
+
+Select your repo folder. Once you do this, VS Code will ask you to choose the correct configuration files.
+
+Make sure to select `Jeykll`.
+
+![jekyll-dev-container-template](../assets/images/2020-05-06/jekyll-dev-container-template.png)
+
+This will automatically create the dev containers config file, Dockerfile, and VS Code Jekyll specific tasks.
+
+I've made a few small modifications to the configuration files.
+
+In the dev container Dockerfile lets uncomment the section to update and install other packages. I'd like to install git as well.
+
+```Dockerfile
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install git
+```
+
+We also want the bundler to install packages after the dev container is created. To do this, open `devcontainer.json` and uncomment the line `"postCreateCommand": "bundle install",`.
+
+If you don't already have the proper `.gitignore` file in your project directly, create one with the following contents:
+
+```
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+```
+
+Your development environment is now running in a container so lets get down to business and create our Jekyll site.
+
+Open a terminal window. Since our dev environment is running in a container with Linux, we are presented with a bash terminal.
+
+Create a new Jekyll site in the current folder. Jekyll will create the site and run `bundle install` to install the required gems.
 
 ```powershell
 jekyll new ./
 ```
 
-What was once an empty folder, should now be populated with the following.
+Your projects file structure should now be similar to the following.
 
-![jekyll-new-file-structure](/assets/images/2020-05-06/jekyll-new-file-structure.png)
+![jekyll-new-file-structure](../assets/images/2020-05-06/jekyll-new-file-structure.png)
 
-Now we are going to build and run the site to check it out.
+Now we are going to build and run the site to check it out. We can manually execute the commands, or use one of the two VS Code tasks that were created for us in `tasks.json`. Lets run the `Serve` task. Open the `Command Palette` and
+search/click `Tasks: Run Task`, then click `Serve`.
 
-Run the command.
 
-```powershell
-bundle exec jekyll serve
-```
+After your site is built, navigate to `http://localhost:4000/` in a browser.
 
-You should be able to ctrl + click to open your default browser and view your site.
-
-![server-address](/assets/images/2020-05-06/server-address.png)
+Voilà, we now have a generated static website!
 
 
 ---
 
 
-### 4. Create a build pipeline
+## Create a build pipeline
 
 We are going to create a build pipeline in Azure DevOps so the site is built each time a push is made to the master or a tag is created. The built site is stored as an Artifact and can be used in other pipelines.
 
 Navigate to **Pipelines** > **Pipelines** and click **Create Pipeline**.
 
-![create-build-pipeline1](/assets/images/2020-05-06/create-build-pipeline1.png)
-
 You will be asked where your code is. Select **Azure Repos Git**.
-
-![create-build-pipeline2](/assets/images/2020-05-06/create-build-pipeline2.png)
 
 Then select your repository.
 
-![create-build-pipeline3](/assets/images/2020-05-06/create-build-pipeline3.png)
-
-We are going to wipe out the example yaml file so you can select **Ruby** or **Starter pipeline**.
-
-![create-build-pipeline4](/assets/images/2020-05-06/create-build-pipeline4.png)
-
-I picked the **Starter pipeline**. Now replace it all with this [Azure pipelines yaml](#azure-pipelines-yaml) code.
-
-![create-build-pipeline5](/assets/images/2020-05-06/create-build-pipeline5.png)
+Choose the **Starter pipeline**. Now replace its contents with this yaml: [Azure pipelines yaml](#azure-pipelines-yaml)
 
 Click **Save and run**, specify commit message and options, then click **Save and run** again.
-
-Lets let the job run and wait for the result.
 
 
 ---
 
 
-### 5. Create a Release Pipeline
+## Create a Release Pipeline
 
-Our site is built and stored in DevOps as an Artifact, waiting to be deployed.
+Our site is built and stored in DevOps as an Artifact, waiting to be deployed. We will create a release pipeline
+that will deploy our site to Azure.
 
 Navigate to **Pipelines** > **Releases** and click **New pipeline**.
 
-![create-release-pipeline1](/assets/images/2020-05-06/create-release-pipeline1.png)
-
 Select **Empty job**
 
-![create-release-pipeline2](/assets/images/2020-05-06/create-release-pipeline2.png)
+![create-release-pipeline2](../assets/images/2020-05-06/create-release-pipeline2.png)
 
 Click **X** to close the Stage pane.
 
-![create-release-pipeline3](/assets/images/2020-05-06/create-release-pipeline3.png)
+![create-release-pipeline3](../assets/images/2020-05-06/create-release-pipeline3.png)
 
 Click **Add an artifact**.
 
 Choose *Build*, select your *Project*, then select the build pipeline we created previously as the *Source*. Click **Add**.
 
-![create-release-pipeline4](/assets/images/2020-05-06/create-release-pipeline4.png)
+![create-release-pipeline4](../assets/images/2020-05-06/create-release-pipeline4.png)
 
 We have now added the artifact so it can be used by the pipeline.
 
 Under *Stage 1*, click **1 job, 0 task**.
 
-![create-release-pipeline5](/assets/images/2020-05-06/create-release-pipeline5.png)
+![create-release-pipeline5](../assets/images/2020-05-06/create-release-pipeline5.png)
 
 #### Add tasks
 
@@ -178,11 +175,11 @@ We have two new tasks to add.
 
 1. The first is to Sync the files in the Artifact with your static website container in the Azure Storage account specified. Click the **+** to add a new task.
 
-![create-release-pipeline6](/assets/images/2020-05-06/create-release-pipeline6.png)
+![create-release-pipeline6](../assets/images/2020-05-06/create-release-pipeline6.png)
 
 Add an `Azure CLI` task.
 
-![create-release-pipeline7](/assets/images/2020-05-06/create-release-pipeline7.png)
+![create-release-pipeline7](../assets/images/2020-05-06/create-release-pipeline7.png)
 
 I updated the *Display name* to **Sync files**, set my Azure subscription and changed the *Script Location* to *Inline script*. Set the inline script to the below.
 
@@ -190,7 +187,7 @@ I updated the *Display name* to **Sync files**, set my Azure subscription and ch
 az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --auth-mode key --account-key $(key)
 ```
 
-![create-release-pipeline8](/assets/images/2020-05-06/create-release-pipeline8.png)
+![create-release-pipeline8](../assets/images/2020-05-06/create-release-pipeline8.png)
 
 2. The second is to Purge the CDN of all cached files so the new site is pulled and cached.
 
@@ -202,7 +199,7 @@ I updated the *Display name* to **Purge CDN**, set my Azure subscription and cha
 az cdn endpoint purge --profile-name $(cdnProfile) --content-paths /* --name $(endpointName) --resource-group $(resourceGroup)
 ```
 
-![create-release-pipeline9](/assets/images/2020-05-06/create-release-pipeline9.png)
+![create-release-pipeline9](../assets/images/2020-05-06/create-release-pipeline9.png)
 
 #### Add variables
 
@@ -228,7 +225,7 @@ Add the following variables:
 
 *resourceGroup*: The name of the Resource Group that contains the Endpoint
 
-![create-release-pipeline10](/assets/images/2020-05-06/create-release-pipeline10.png)
+![create-release-pipeline10](../assets/images/2020-05-06/create-release-pipeline10.png)
 
 **Make sure to Save your pipeline**
 
@@ -252,16 +249,40 @@ The web address to access the site is currently the `Primary endpoint` for the S
 ---
 
 
-### 6. Configure Azure CDN to enforce HTTPS & setup custom domains
+## Create a resource group in Azure
+
+Create a resource group in Azure that will hold all of the blogs resources. In this instance, I'm naming the resource group `BlogResourceGroup`.
+
+---
+
+
+## Setup storage account in Azure
+
+**Create** a storage account in Azure
+
+![create-storage-account](../assets/images/2020-05-06/create-storage-account.png)
+
+In the storage account, go to **Static website**. Set the `Static website`
+option to `Enabled`. **Save** the change.
+
+![storage-static-website](../assets/images/2020-05-06/storage-static-website.png)
+
+Write down the `Primary endpoint`. You will need it later.
+
+
+---
+
+
+## Configure Azure CDN to enforce HTTPS & setup custom domains
 
 Now we want to utilize Azure CDN to cache the static site so it is fast & secure for viewers.
 
 >**IMPORTANT**  
 >I was able to get my apex domain added as a custom domain to my Azure CDN endpoint, but Azure no longer supports using their free SSL certificates for apex domains. I can't purchase one because it would blow my yearly budget. The option I came up with involves setting up Azure CDN using the `www` subdomain and then forwarding requests to the apex domain to the www subdomain. While I personally dislike having to use the `www` subdomain at all, it is providing me a free SSL certificate.
 
-![azure-cdn-apex-https-fail](/assets/images/2020-05-06/azure-cdn-apex-https-fail.png)
+![azure-cdn-apex-https-fail](../assets/images/2020-05-06/azure-cdn-apex-https-fail.png)
 
-#### Create Azure CDN endpoint
+### Create Azure CDN endpoint
 
 While viewing the storage account resource, under **Blob service**, go to **Azure CDN**.
 
@@ -275,15 +296,15 @@ Enter the **CDN endpoint name**.
 
 Click **Create**.
 
-![create-azure-cdn-endpoint](/assets/images/2020-05-06/create-azure-cdn-endpoint.png)
+![create-azure-cdn-endpoint](../assets/images/2020-05-06/create-azure-cdn-endpoint.png)
 
 Navigate to the newely created resource.
 
 Navigate to **Settings** > **Origin** and deselect **HTTP**. We only want to allow HTTPS.
 
-![endpoint-disable-http](/assets/images/2020-05-06/endpoint-disable-http.png)
+![endpoint-disable-http](../assets/images/2020-05-06/endpoint-disable-http.png)
 
-#### Add DNS records to domain
+### Add DNS records to domain
 
 In order to setup our custom domains Azure needs to verify you own the domain so we need to setup some CNAME records that Azure can verify.
 
@@ -291,25 +312,25 @@ Add a CNAME with **Host** `www` and **Value** `myblog-endpoint.azureedge.net`.
 
 I'm using GoDaddy for my domains.
 
-![cname-records](/assets/images/2020-05-06/cname-records.png)
+![cname-records](../assets/images/2020-05-06/cname-records.png)
 
-#### Add custom domain to the CDN endpoint
+### Add custom domain to the CDN endpoint
 
 Navigate to the Azure CDN Endpoint resource.
 
 Navigate to **Settings** > **Custom domains** > **+ Custom domain**
 
-![add-custom-domain-to-endpoint](/assets/images/2020-05-06/add-custom-domain-to-endpoint.png)
+![add-custom-domain-to-endpoint](../assets/images/2020-05-06/add-custom-domain-to-endpoint.png)
 
 Fill in your `www` subdomain. If Azure is able to verify your CNAME record you will see the green check, otherwise there will be a red X.
 
-![add-a-custom-domain](/assets/images/2020-05-06/add-a-custom-domain.png)
+![add-a-custom-domain](../assets/images/2020-05-06/add-a-custom-domain.png)
 
 Now we need to enable HTTPS for the hostname.
 
 Click your custom domain.
 
-![endpoint-custom-domains](/assets/images/2020-05-06/endpoint-custom-domains.png)
+![endpoint-custom-domains](../assets/images/2020-05-06/endpoint-custom-domains.png)
 
 Set **Custom domain HTTPS** to **On**.
 
@@ -317,7 +338,7 @@ I am using Azure's free certificates so I set **Certificate management type** to
 
 Then click **Save**.
 
-![enable-custom-domain-https](/assets/images/2020-05-06/enable-custom-domain-https.png)
+![enable-custom-domain-https](../assets/images/2020-05-06/enable-custom-domain-https.png)
 
 In my experience, the certificate deployment process can take a few hours to complete.
 
@@ -325,32 +346,32 @@ Once complete, the screen should look like the below.
 
 
 
-![https-successfully-enabled](/assets/images/2020-05-06/https-successfully-enabled.png)
+![https-successfully-enabled](../assets/images/2020-05-06/https-successfully-enabled.png)
 
 
-#### Complete custom domain setup
+### Complete custom domain setup
 
 
-![godaddy-domain-forwarding](/assets/images/2020-05-06/godaddy-domain-forwarding.png)
+![godaddy-domain-forwarding](../assets/images/2020-05-06/godaddy-domain-forwarding.png)
 
 
 ---
 
 
-### 7. Setup special HTTP rules for the CDN endpoint
+## Setup special HTTP rules for the CDN endpoint
 
 Change text to lowercase.
 
-![Screenshot](/assets/images/2020-05-06/change-to-lowercase.png)
+![Screenshot](../assets/images/2020-05-06/change-to-lowercase.png)
 
 
 HSTS Header
 
-![Screenshot](/assets/images/2020-05-06/hsts-header.png)
+![Screenshot](../assets/images/2020-05-06/hsts-header.png)
 
 HTTP to HTTPS Redirect
 
-![Screenshot](/assets/images/2020-05-06/http-to-https-redirect.png)
+![Screenshot](../assets/images/2020-05-06/http-to-https-redirect.png)
 
 Redirect Root to WWW
 
@@ -358,22 +379,22 @@ Redirect Root to WWW
 
 This wasn't working for me. I had to use GoDaddy to forward the domain to the www subdomain, which was mapped to the Azure CDN endpoint.
 
-![Screenshot](/assets/images/2020-05-06/redirect-root-to-www.png)
+![Screenshot](../assets/images/2020-05-06/redirect-root-to-www.png)
 
 
 ---
 
 
-### 8. Releasing a build to the static site container
+## Releasing a build to the static site container
 
 
 
 ---
 
-### Appendixes
+## Appendixes
 
 
-#### Appendix A: Site urls
+### Appendix A: Site urls
 
 http://alexoswald.com - Redirected to Origin with GoDaddy domain forwarding
 
@@ -384,9 +405,7 @@ http://www.alexoswald.com - Redirected to Origin with CDN HTTP rule
 https://www.alexoswald.com - Origin
 
 
-#### Appendix B: DevOps Code
-
-##### Azure pipelines yaml
+### Appendix B: DevOps Code
 
 `azure-pipelines.yaml`
 
@@ -436,7 +455,7 @@ steps:
     ArtifactName: '_site'
 ```
 
-##### Sync files
+#### Sync files
 
 ```yaml
 # This code syncs with the storage blob you specify
@@ -453,7 +472,7 @@ steps:
     workingDirectory: '$(System.DefaultWorkingDirectory)/_MyBlog'
 ```
 
-##### Purge CDN
+#### Purge CDN
 
 ```yaml
 # Purges the CDN's cache so it has to fetch new (updated)
@@ -470,7 +489,7 @@ steps:
 ---
 
 
-#### Appendix C: References
+### Appendix C: References
 
 Here are some other developer blog posts that helped me complete this project.
 
