@@ -1,5 +1,5 @@
 ---
-title: "Creating a Fast Blog with Jekyll, Dev Containers & Azure CDN!"
+title: "Creating a Static Blog with Jekyll, Dev Containers & Azure CDN!"
 date: 2020-10-24
 toc: true
 toc_label: 'Outline'
@@ -305,42 +305,17 @@ This process may take a few minutes. Once complete, open a browser and navigate 
 ---
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Configure Azure CDN to enforce HTTPS & setup custom domains
-
-Now we want to utilize Azure CDN to cache the static site so it is fast & secure for viewers.
-
->**IMPORTANT**  
->I was able to get my apex domain added as a custom domain to my Azure CDN endpoint, but Azure no longer supports using their free SSL certificates for apex domains. I can't purchase one because it would blow my yearly budget. The option I came up with involves setting up Azure CDN using the `www` subdomain and then forwarding requests to the apex domain to the www subdomain. While I personally dislike having to use the `www` subdomain at all, it is providing me a free SSL certificate.
-
-![azure-cdn-apex-https-fail](/assets/images/2020-10-25/azure-cdn-apex-https-fail.png)
-
-
+## Setup custom domain
 
 ### Add DNS records to domain
 
 In order to setup our custom domains Azure needs to verify you own the domain so we need to setup some CNAME records that Azure can verify.
 
-Add a CNAME with **Host** `www` and **Value** `myblog-endpoint.azureedge.net`.
+Go to your domain providers DNS management page.
+
+Add a CNAME with **Host** `cdnverify.www` and **Value** `cdnverify.endpointname.azureedge.net`.
+
+Add a CNAME with **Host** `www` and **Value** `endpointname.azureedge.net`.
 
 I'm using GoDaddy for my domains.
 
@@ -376,68 +351,29 @@ In my experience, the certificate deployment process can take a few hours to com
 
 Once complete, the screen should look like the below.
 
-
-
 ![https-successfully-enabled](/assets/images/2020-10-25/https-successfully-enabled.png)
 
 
-### Complete custom domain setup
 
 
-![godaddy-domain-forwarding](/assets/images/2020-10-25/godaddy-domain-forwarding.png)
 
 
----
 
 
-## Setup special HTTP rules for the CDN endpoint
-
-Change text to lowercase.
-
-![Screenshot](/assets/images/2020-10-25/change-to-lowercase.png)
 
 
-HSTS Header
 
-![Screenshot](/assets/images/2020-10-25/hsts-header.png)
 
-HTTP to HTTPS Redirect
 
-![Screenshot](/assets/images/2020-10-25/http-to-https-redirect.png)
 
-Redirect Root to WWW
-
-**DID NOT WORK FOR ME**
-
-This wasn't working for me. I had to use GoDaddy to forward the domain to the www subdomain, which was mapped to the Azure CDN endpoint.
-
-![Screenshot](/assets/images/2020-10-25/redirect-root-to-www.png)
 
 
 ---
 
-
-## Releasing a build to the static site container
-
-
-
----
 
 ## Appendixes
 
-
-### Appendix A: Site urls
-
-http://alexoswald.com - Redirected to Origin with GoDaddy domain forwarding
-
-https://alexoswald.com - 
-
-http://www.alexoswald.com - Redirected to Origin with CDN HTTP rule
-
-https://www.alexoswald.com - Origin
-
-
-### Appendix B: DevOps Code
+### Appendix A: DevOps Code
 
 `azure-pipelines.yaml`
 
@@ -518,13 +454,100 @@ steps:
     inlineScript: 'az cdn endpoint purge --profile-name $(cdnProfile) --content-paths /* --name $(endpointName) --resource-group $(resourceGroup)'
 ```
 
+
 ---
 
 
-### Appendix C: References
+### Appendix B: References
 
 Here are some other developer blog posts that helped me complete this project.
 
 - [https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/](https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/)
 - [https://www.glennprince.com/article/moving-my-site-onto-a-cdn/](https://www.glennprince.com/article/moving-my-site-onto-a-cdn/)
 - [https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version](https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version)
+
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+---
+
+Now we want to utilize Azure CDN to cache the static site so it is fast & secure for viewers.
+
+>**IMPORTANT**  
+>I was able to get my apex domain added as a custom domain to my Azure CDN endpoint, but Azure no longer supports using their free SSL certificates for apex domains. I can't purchase one because it would blow my yearly budget. The option I came up with involves setting up Azure CDN using the `www` subdomain and then forwarding requests to the apex domain to the www subdomain. While I personally dislike having to use the `www` subdomain at all, it is providing me a free SSL certificate.
+
+![azure-cdn-apex-https-fail](/assets/images/2020-10-25/azure-cdn-apex-https-fail.png)
+
+
+---
+
+
+## Setup special HTTP rules for the CDN endpoint
+
+Change text to lowercase.
+
+![Screenshot](/assets/images/2020-10-25/change-to-lowercase.png)
+
+
+HSTS Header
+
+![Screenshot](/assets/images/2020-10-25/hsts-header.png)
+
+HTTP to HTTPS Redirect
+
+![Screenshot](/assets/images/2020-10-25/http-to-https-redirect.png)
+
+Redirect Root to WWW
+
+**DID NOT WORK FOR ME**
+
+This wasn't working for me. I had to use GoDaddy to forward the domain to the www subdomain, which was mapped to the Azure CDN endpoint.
+
+![Screenshot](/assets/images/2020-10-25/redirect-root-to-www.png)
+
+![godaddy-domain-forwarding](/assets/images/2020-10-25/godaddy-domain-forwarding.png)
+
+---
+
+
+### Appendix A: Site urls
+
+http://alexoswald.com - Redirected to Origin with GoDaddy domain forwarding
+
+https://alexoswald.com - 
+
+http://www.alexoswald.com - Redirected to Origin with CDN HTTP rule
+
+https://www.alexoswald.com - Origin
