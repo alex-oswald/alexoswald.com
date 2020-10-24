@@ -240,7 +240,7 @@ Add an `Azure CLI` task.
  Configure the task:
  - Update **Display name** to **Sync files**
  - Set **Azure Resource Manager connection**
- - Set **Script Type** to **Powershell Core**
+ - Set **Script Type** to **Batch**
  - Set **Script Location** to **Inline script**.
  - Set the **Inline Script** to the following:
 
@@ -257,7 +257,7 @@ Add another `Azure CLI` task.
  Configure the task:
  - Update **Display name** to **Purge CDN**
  - Set **Azure Resource Manager connection**
- - Set **Script Type** to **Powershell Core**
+ - Set **Script Type** to **Batch**
  - Set **Script Location** to **Inline script**.
  - Set the **Inline Script** to the following:
 
