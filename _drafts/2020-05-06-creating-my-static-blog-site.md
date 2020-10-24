@@ -8,30 +8,29 @@ toc_sticky: true
 ---
 
 
-I've always wanted to create my own blog to share my solutions to different coding problems I've solved over the years. I've finally made time to create one.
-After reading a few other developers blog posts I was able to get a solution working for me that I was happy with.
+I've always wanted to create my own blog to share my solutions to different coding problems I've experienced over the years. I've finally made time to create one, so here is how I did it.
 
 I started with a few requirements:
 
 - Static site generator - I wanted to use a static site generator for its simplicity and speed benefits.
-- Custom domain - I've purchased my own domain so I want to make sure I can use it for my blog.
-- Fast & secure - I want it to be fast & be secure. Load times under 500ms would be great.
+- Custom domain - Use the domain I purchased: `alexoswald.com`
+- Fast & secure - It needs to be fast & secure. Load times under 500ms would be nice.
 - Cheap, less than $50 per year - The domain is $20 a year from GoDaddy with privacy. That leaves $30 for hosting and security.
 
-I am a .NET fanatic and everything Microsoft related so I will most always utilize their tools.
+I am a Microsoft fan and .NET fanatic so I will most always utilize their tools.
 Another few requirements regarding personal preferences:
 
 - Azure DevOps for version control
-- Azure Pipelines for builds and release deployments (no dev deployment)
+- Azure Pipelines for builds and release deployments
 - Deployed in Azure
 
-In this guide, we will setup Azure to host the blog via Azure CDN for speedy access. We will use Jekyll to generate our static site. Since I don't want to install Ruby or Jekyll on my computer, we will develop the site in VSCode using dev containers. With dev containers, we can develop inside a container that already has Ruby and Jekyll installed.
+In this guide, we will setup Azure to host a blog via Azure CDN. We will use Jekyll to generate our static site. Since we don't want to deal with installing Ruby or Jekyll, we will develop the site in VSCode using dev containers. With dev containers, we can develop inside a container that already has Ruby and Jekyll installed.
 
 
 ---
 
 
-### Prerequisites
+## Prerequisites
 
 - Azure subscription
 
@@ -47,36 +46,88 @@ In this guide, we will setup Azure to host the blog via Azure CDN for speedy acc
 ---
 
 
-## Create project in Azure DevOps
+## Create a resource group in Azure
 
-Login to your DevOps account [https://dev.azure.com/](https://dev.azure.com/).
+Create a resource group in Azure that will hold all of the blogs resources. In this instance, I'm naming the resource group `BlogResourceGroup`. #variables-resourceGroup
 
-Add a new project, making sure *Version control* is set to **Git**.
+---
 
-Navigate to **Repos** > **Files**.
 
-Now we are going to **Clone in VS Code** for next steps
+## Setup storage account in Azure
+
+**Create** a storage account in Azure
+
+![create-storage-account](../assets/images/2020-05-06/create-storage-account.png)
+
+In the storage account, go to **Static website**. Set the `Static website`
+option to `Enabled`. **Save** the change.
+
+![storage-static-website](../assets/images/2020-05-06/storage-static-website.png)
+
+The `Primary endpoint` will be used in the next step.
+
+Visit **Settings** > **Access keys**.
+
+**key1** will be used in the Azure pipeline to access the storage account. #variables-key
+
+### Create Azure CDN endpoint
+
+While viewing the storage account resource, under **Blob service**, go to **Azure CDN**.
+
+From here, we are going to create a new `Endpoint`.
+
+For **CDN profile**, select **Create new**, with the name of your choosing. #variables-cdnProfile
+
+Set the **Pricing tier** to **Premium Verizon** so we can set HTTP rules later.
+
+Set the **Origin hostname** to the static website `Primary endpoint` from above.
+
+Enter the **CDN endpoint name**. #variables-endpointName
+
+Click **Create**.
+
+![create-azure-cdn-endpoint](../assets/images/2020-05-06/create-azure-cdn-endpoint.png)
+
+Navigate to the newely created resource.
+
+Navigate to **Settings** > **Origin** and deselect **HTTP**. We only want to allow HTTPS.
+
+![endpoint-disable-http](../assets/images/2020-05-06/endpoint-disable-http.png)
 
 
 ---
 
 
-## Generate the site with Jekyll inside a Dev Container
+## Create project in Azure DevOps
+
+Login to your DevOps account: [https://dev.azure.com/](https://dev.azure.com/)
+
+Add a new project, making sure *Version control* is set to **Git**.
+
+Navigate to **Repos** > **Files**.
+
+Now we are going to **Clone in VS Code** for next steps.
+
+
+---
+
+
+## Use Jekyll to generate the site inside a Dev Container
 
 [Check out Microsoft's dev containers tutorial](https://code.visualstudio.com/docs/remote/containers-tutorial)
 
 We have an empty repo now open in VS Code. To get started, lets get our dev container running. To do this,
-open the `Command Pallete` and run the task `Remote-Contianers: Open Folder in Container`.
+open the `Command Palette` and run the task `Remote-Containers: Open Folder in Container`.
 
 ![open-folder-dev-container](../assets/images/2020-05-06/open-folder-dev-container.png)
 
 Select your repo folder. Once you do this, VS Code will ask you to choose the correct configuration files.
 
-Make sure to select `Jeykll`.
+We will select `Jeykll`.
 
 ![jekyll-dev-container-template](../assets/images/2020-05-06/jekyll-dev-container-template.png)
 
-This will automatically create the dev containers config file, Dockerfile, and VS Code Jekyll specific tasks.
+This will automatically create the dev containers config file, Dockerfile, and VS Code tasks for Jekyll.
 
 I've made a few small modifications to the configuration files.
 
@@ -89,7 +140,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 We also want the bundler to install packages after the dev container is created. To do this, open `devcontainer.json` and uncomment the line `"postCreateCommand": "bundle install",`.
 
-If you don't already have the proper `.gitignore` file in your project directly, create one with the following contents:
+If you don't already have the proper `.gitignore` file in your project directory, create one with the following contents (this file was generated for me by Azure Devops):
 
 ```
 _site
@@ -102,21 +153,22 @@ Your development environment is now running in a container so lets get down to b
 
 Open a terminal window. Since our dev environment is running in a container with Linux, we are presented with a bash terminal.
 
-Create a new Jekyll site in the current folder. Jekyll will create the site and run `bundle install` to install the required gems.
+Create a new Jekyll site in the current folder.
 
 ```powershell
 jekyll new ./
 ```
 
-Your projects file structure should now be similar to the following.
+Jekyll will create the site, and a `Gemfile`. Then it will run `bundle install` to install the gems specified in the `Gemfile`.
+
+Your projects file structure should now be similar to the following. Items in green were created by Jekyll.
 
 ![jekyll-new-file-structure](../assets/images/2020-05-06/jekyll-new-file-structure.png)
 
 Now we are going to build and run the site to check it out. We can manually execute the commands, or use one of the two VS Code tasks that were created for us in `tasks.json`. Lets run the `Serve` task. Open the `Command Palette` and
 search/click `Tasks: Run Task`, then click `Serve`.
 
-
-After your site is built, navigate to `http://localhost:4000/` in a browser.
+After your site is built, navigate to [http://localhost:4000/](http://localhost:4000/) in a browser.
 
 Voilà, we now have a generated static website!
 
@@ -155,8 +207,6 @@ Select **Empty job**
 
 Click **X** to close the Stage pane.
 
-![create-release-pipeline3](../assets/images/2020-05-06/create-release-pipeline3.png)
-
 Click **Add an artifact**.
 
 Choose *Build*, select your *Project*, then select the build pipeline we created previously as the *Source*. Click **Add**.
@@ -169,11 +219,13 @@ Under *Stage 1*, click **1 job, 0 task**.
 
 ![create-release-pipeline5](../assets/images/2020-05-06/create-release-pipeline5.png)
 
-#### Add tasks
+### Add tasks
 
-We have two new tasks to add.
+We have two new tasks to add, but first we want to update our agent.
 
-1. The first is to Sync the files in the Artifact with your static website container in the Azure Storage account specified. Click the **+** to add a new task.
+1. Click **Agent job**. Under **Agent Specification** pick the latest ubuntu, in this case `ubuntu-20.04`.
+
+2. The first task is to Sync the files in the Artifact with your static website container in the Azure Storage account specified. Click the **+** to add a new task.
 
 ![create-release-pipeline6](../assets/images/2020-05-06/create-release-pipeline6.png)
 
@@ -181,7 +233,12 @@ Add an `Azure CLI` task.
 
 ![create-release-pipeline7](../assets/images/2020-05-06/create-release-pipeline7.png)
 
-I updated the *Display name* to **Sync files**, set my Azure subscription and changed the *Script Location* to *Inline script*. Set the inline script to the below.
+ Configure the task:
+ - Update **Display name** to **Sync files**
+ - Set **Azure Resource Manager connection**
+ - Set **Script Type** to **Powershell Core**
+ - Set **Script Location** to **Inline script**.
+ - Set the **Inline Script** to the following:
 
 ```powershell
 az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --auth-mode key --account-key $(key)
@@ -189,47 +246,50 @@ az storage blob sync --source $(source) --container $(containerName) --account-n
 
 ![create-release-pipeline8](../assets/images/2020-05-06/create-release-pipeline8.png)
 
-2. The second is to Purge the CDN of all cached files so the new site is pulled and cached.
+3. The second task is to Purge the CDN of all cached files so the new site is pulled and cached.
 
 Add another `Azure CLI` task.
 
-I updated the *Display name* to **Purge CDN**, set my Azure subscription and changed the *Script Location* to *Inline script*. Set the inline script to the below.
+ Configure the task:
+ - Update **Display name** to **Purge CDN**
+ - Set **Azure Resource Manager connection**
+ - Set **Script Type** to **Powershell Core**
+ - Set **Script Location** to **Inline script**.
+ - Set the **Inline Script** to the following:
 
 ```powershell
 az cdn endpoint purge --profile-name $(cdnProfile) --content-paths /* --name $(endpointName) --resource-group $(resourceGroup)
 ```
 
-![create-release-pipeline9](../assets/images/2020-05-06/create-release-pipeline9.png)
+### Add variables
 
-#### Add variables
-
-Both of our tasks use multiple variables to define. While still editing Release, click **Variables**.
+Both of our tasks use multiple variables we need to define. While still editing Release, click **Variables**.
 
 Add the following variables:
 
 **Sync files**
 
-*source*: Folder name in the artifact that contains the site
+*source*: Folder name in the artifact that contains the site, `_site` for Jekyll
 
 *containerName*:  $web (set by Azure)
 
 *storageAccount*:  The name of your storage account
 
-*key*: Access key to your storage account
+[*key*](#variables-key): Access key to your storage account
 
 **Purge CDN**
 
-*cdnProfile*: The name of the CDN Profile used by the Endpoint resource
+[*cdnProfile*](#variables-cdnProfile): The name of the CDN Profile used by the Endpoint resource
 
-*endpointName*: The name of the Endpoint
+[*endpointName*](#variables-endpointName): The name of the Endpoint
 
-*resourceGroup*: The name of the Resource Group that contains the Endpoint
+[*resourceGroup*](#variables-resourceGroup): The name of the Resource Group that contains the Endpoint
 
 ![create-release-pipeline10](../assets/images/2020-05-06/create-release-pipeline10.png)
 
 **Make sure to Save your pipeline**
 
-#### Create a release
+### Create a release
 
 In the top right next to the Save button you just clicked, click **Create release**, after the dialog shows, click **Create**.
 
@@ -249,28 +309,24 @@ The web address to access the site is currently the `Primary endpoint` for the S
 ---
 
 
-## Create a resource group in Azure
-
-Create a resource group in Azure that will hold all of the blogs resources. In this instance, I'm naming the resource group `BlogResourceGroup`.
-
----
 
 
-## Setup storage account in Azure
-
-**Create** a storage account in Azure
-
-![create-storage-account](../assets/images/2020-05-06/create-storage-account.png)
-
-In the storage account, go to **Static website**. Set the `Static website`
-option to `Enabled`. **Save** the change.
-
-![storage-static-website](../assets/images/2020-05-06/storage-static-website.png)
-
-Write down the `Primary endpoint`. You will need it later.
 
 
----
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Configure Azure CDN to enforce HTTPS & setup custom domains
@@ -282,27 +338,7 @@ Now we want to utilize Azure CDN to cache the static site so it is fast & secure
 
 ![azure-cdn-apex-https-fail](../assets/images/2020-05-06/azure-cdn-apex-https-fail.png)
 
-### Create Azure CDN endpoint
 
-While viewing the storage account resource, under **Blob service**, go to **Azure CDN**.
-
-From here, we are going to create a new `Endpoint`.
-
-Create a new **CDN profile** with the name of your choosing.
-
-Make sure the **Pricing tier** is set to *Premium Verizon* so we can set HTTP rules later.
-
-Enter the **CDN endpoint name**.
-
-Click **Create**.
-
-![create-azure-cdn-endpoint](../assets/images/2020-05-06/create-azure-cdn-endpoint.png)
-
-Navigate to the newely created resource.
-
-Navigate to **Settings** > **Origin** and deselect **HTTP**. We only want to allow HTTPS.
-
-![endpoint-disable-http](../assets/images/2020-05-06/endpoint-disable-http.png)
 
 ### Add DNS records to domain
 
