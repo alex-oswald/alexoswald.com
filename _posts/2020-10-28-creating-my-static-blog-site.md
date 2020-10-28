@@ -1,6 +1,6 @@
 ---
 title: "Creating a Static Blog with Jekyll, Dev Containers & Azure CDN!"
-date: 2020-10-24
+date: 2020-10-28
 toc: true
 toc_label: 'Outline'
 toc_icon: list-alt
@@ -14,7 +14,7 @@ I started with a few requirements:
 
 - Static site generator - I wanted to use a static site generator for its simplicity and speed benefits.
 - Custom domain - Use the domain I purchased: `alexoswald.com`
-- Fast & secure - It needs to be fast & secure. Consistent load times under 750-1000ms would be nice.
+- Fast & secure - It needs to be secure and fast, with caching.
 - Cheap, less than $50 per year - The domain is $20 a year from GoDaddy with privacy. That leaves $30 for hosting and security.
 
 I am a Microsoft fan and .NET fanatic so I will most always utilize their tools.
@@ -22,12 +22,11 @@ Another few requirements regarding personal preferences:
 
 - Azure DevOps for version control
 - Azure Pipelines for builds and release deployments
-- Deployed in Azure
+- Azure CDN
 
-In this guide, we will setup Azure to host a blog via Azure CDN. We will use Jekyll to generate our static site. Since we don't want to deal with installing Ruby or Jekyll, we will develop the site in VSCode using dev containers. With dev containers, we can develop inside a container that already has Ruby and Jekyll installed.
+In this guide, we will setup Azure to host a blog via Azure CDN. We will use Jekyll to generate our static site. Since we don't want to deal with installing Ruby or Jekyll, we will develop the site in Visual Studio Code using dev containers. With dev containers, we can develop inside a container that already has Ruby and Jekyll installed.
 
 
----
 
 
 ## Prerequisites
@@ -43,14 +42,13 @@ In this guide, we will setup Azure to host a blog via Azure CDN. We will use Jek
 - Docker Desktop
 
 
----
 
 
 ## Create a resource group in Azure
 
-Create a resource group in Azure that will hold all of the blogs resources. In this instance, I'm naming the resource group `BlogResourceGroup`. #variables-resourceGroup
+Create a resource group in Azure that will hold all of the blogs resources. In this instance, I'm naming the resource group `AlexsBlogResourceGroup`.
 
----
+
 
 
 ## Setup storage account in Azure
@@ -74,7 +72,7 @@ The `Primary endpoint` will be used in the next step.
 
 Visit **Settings** > **Access keys**.
 
-**key1** will be used in the Azure pipeline to access the storage account. #variables-key
+**key1** will be used in the Azure pipeline to access the storage account.
 
 ### Create Azure CDN endpoint
 
@@ -82,13 +80,13 @@ While viewing the storage account resource, under **Blob service**, go to **Azur
 
 From here, we are going to create a new `Endpoint`.
 
-For **CDN profile**, select **Create new**, with the name of your choosing. #variables-cdnProfile
+For **CDN profile**, select **Create new**, with the name of your choosing.
 
 Set the **Pricing tier** to **Premium Verizon** so we can set HTTP rules later.
 
 Set the **Origin hostname** to the static website `Primary endpoint` from above.
 
-Enter the **CDN endpoint name**. #variables-endpointName
+Enter the **CDN endpoint name**.
 
 Click **Create**.
 
@@ -101,7 +99,6 @@ Navigate to **Settings** > **Origin** and deselect **HTTP**. We only want to all
 ![endpoint-disable-http](/assets/images/2020-10-25/endpoint-disable-http.png)
 
 
----
 
 
 ## Create project in Azure DevOps
@@ -115,7 +112,6 @@ Navigate to **Repos** > **Files**.
 Now we are going to **Clone in VS Code** for next steps.
 
 
----
 
 
 ## Use Jekyll to generate the site inside a Dev Container
@@ -139,7 +135,7 @@ I've made a few small modifications to the configuration files.
 
 In the dev container Dockerfile lets uncomment the section to update and install other packages. I'd like to install git as well.
 
-```Dockerfile
+```
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install git
 ```
@@ -179,7 +175,6 @@ After your site is built, navigate to [http://localhost:4000/](http://localhost:
 Voilà, we now have a generated static website!
 
 
----
 
 
 ## Create a build pipeline
@@ -192,192 +187,11 @@ You will be asked where your code is. Select **Azure Repos Git**.
 
 Then select your repository.
 
-Choose the **Starter pipeline**. Now replace its contents with this yaml: [Azure pipelines yaml](#azure-pipelines-yaml)
-
-Click **Save and run**, specify commit message and options, then click **Save and run** again.
-
-
----
-
-
-## Create a Release Pipeline
-
-Our site is built and stored in DevOps as an Artifact, waiting to be deployed. We will create a release pipeline
-that will deploy our site to Azure.
-
-Navigate to **Pipelines** > **Releases** and click **New pipeline**.
-
-Select **Empty job**
-
-![create-release-pipeline2](/assets/images/2020-10-25/create-release-pipeline2.png)
-
-Click **X** to close the Stage pane.
-
-Click **Add an artifact**.
-
-Choose *Build*, select your *Project*, then select the build pipeline we created previously as the *Source*. Click **Add**.
-
-![create-release-pipeline4](/assets/images/2020-10-25/create-release-pipeline4.png)
-
-We have now added the artifact so it can be used by the pipeline.
-
-Under *Stage 1*, click **1 job, 0 task**.
-
-![create-release-pipeline5](/assets/images/2020-10-25/create-release-pipeline5.png)
-
-### Add tasks
-
-We have two new tasks to add.
-
-1. The first task is to Sync the files in the Artifact with your static website container in the Azure Storage account specified. Click the **+** to add a new task.
-
-![create-release-pipeline6](/assets/images/2020-10-25/create-release-pipeline6.png)
-
-Add an `Azure CLI` task.
-
-![create-release-pipeline7](/assets/images/2020-10-25/create-release-pipeline7.png)
-
- Configure the task:
- - Update **Display name** to **Sync files**
- - Set **Azure Resource Manager connection**
- - Set **Script Type** to **Batch**
- - Set **Script Location** to **Inline script**.
- - Set the **Inline Script** to the following:
-
-```powershell
-az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --auth-mode key --account-key $(key)
-```
-
-![create-release-pipeline8](/assets/images/2020-10-25/create-release-pipeline8.png)
-
-3. The second task is to Purge the CDN of all cached files so the new site is pulled and cached.
-
-Add another `Azure CLI` task.
-
- Configure the task:
- - Update **Display name** to **Purge CDN**
- - Set **Azure Resource Manager connection**
- - Set **Script Type** to **Batch**
- - Set **Script Location** to **Inline script**.
- - Set the **Inline Script** to the following:
-
-```powershell
-az cdn endpoint purge --profile-name $(cdnProfile) --content-paths /* --name $(endpointName) --resource-group $(resourceGroup)
-```
-
-### Add variables
-
-Both of our tasks use multiple variables we need to define. While still editing Release, click **Variables**.
-
-Add the following variables:
-
-**Sync files**
-
-*source*: Folder name in the artifact that contains the site, `_site` for Jekyll
-
-*containerName*:  $web (set by Azure)
-
-*storageAccount*:  The name of your storage account
-
-[*key*](#variables-key): Access key to your storage account
-
-**Purge CDN**
-
-[*cdnProfile*](#variables-cdnProfile): The name of the CDN Profile used by the Endpoint resource
-
-[*endpointName*](#variables-endpointName): The name of the Endpoint
-
-[*resourceGroup*](#variables-resourceGroup): The name of the Resource Group that contains the Endpoint
-
-![create-release-pipeline10](/assets/images/2020-10-25/create-release-pipeline10.png)
-
-**Make sure to Save your pipeline**
-
-### Create a release
-
-In the top right next to the Save button you just clicked, click **Create release**, after the dialog shows, click **Create**.
-
-This process may take a few minutes. Once complete, open a browser and navigate to the storage accounts `Primary endpoint` you wrote down previously. You can also access the site via the CDN endpoint we created. The site will be `https://endpointname.azureedge.net`.
-
-## Your site should now be deployed!
-
-
----
-
-
-## Setup custom domain
-
-### Add DNS records to domain
-
-In order to setup our custom domains Azure needs to verify you own the domain so we need to setup some CNAME records that Azure can verify.
-
-Go to your domain providers DNS management page.
-
-Add a CNAME with **Host** `cdnverify.www` and **Value** `cdnverify.endpointname.azureedge.net`.
-
-Add a CNAME with **Host** `www` and **Value** `endpointname.azureedge.net`.
-
-I'm using GoDaddy for my domains.
-
-![cname-records](/assets/images/2020-10-25/cname-records.png)
-
-### Add custom domain to the CDN endpoint
-
-Navigate to the Azure CDN Endpoint resource.
-
-Navigate to **Settings** > **Custom domains** > **+ Custom domain**
-
-![add-custom-domain-to-endpoint](/assets/images/2020-10-25/add-custom-domain-to-endpoint.png)
-
-Fill in your `www` subdomain. If Azure is able to verify your CNAME record you will see the green check, otherwise there will be a red X.
-
-![add-a-custom-domain](/assets/images/2020-10-25/add-a-custom-domain.png)
-
-Now we need to enable HTTPS for the hostname.
-
-Click your custom domain.
-
-![endpoint-custom-domains](/assets/images/2020-10-25/endpoint-custom-domains.png)
-
-Set **Custom domain HTTPS** to **On**.
-
-I am using Azure's free certificates so I set **Certificate management type** to **CDN managed**.
-
-Then click **Save**.
-
-![enable-custom-domain-https](/assets/images/2020-10-25/enable-custom-domain-https.png)
-
-In my experience, the certificate deployment process can take a few hours to complete.
-
-Once complete, the screen should look like the below.
-
-![https-successfully-enabled](/assets/images/2020-10-25/https-successfully-enabled.png)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-
-## Appendixes
-
-### Appendix A: DevOps Code
-
-`azure-pipelines.yaml`
+Choose the **Starter pipeline**. Now replace its contents with this yaml:
 
 ```yaml
+# azure-pipelines.yaml
+
 # Trigger pipeline on any push to master and any tag creations
 trigger:
   branches:
@@ -423,13 +237,66 @@ steps:
     ArtifactName: '_site'
 ```
 
-#### Sync files
+Click **Save and run**, specify commit message and options, then click **Save and run** again.
+
+
+
+
+## Create a Release Pipeline
+
+Our site is built and stored in DevOps as an Artifact, waiting to be deployed. We will create a release pipeline
+that will deploy our site to Azure.
+
+Navigate to **Pipelines** > **Releases** and click **New pipeline**.
+
+Select **Empty job**
+
+![create-release-pipeline1](/assets/images/2020-10-25/create-release-pipeline1.png)
+
+Click **X** to close the Stage pane.
+
+Click **Add an artifact**.
+
+Choose *Build*, select your *Project*, then select the build pipeline we created previously as the *Source*. Click **Add**.
+
+![create-release-pipeline2](/assets/images/2020-10-25/create-release-pipeline2.png)
+
+We have now added the artifact so it can be used by the pipeline.
+
+Under *Stage 1*, click **1 job, 0 task**.
+
+![create-release-pipeline3](/assets/images/2020-10-25/create-release-pipeline3.png)
+
+### Add tasks
+
+We have two new tasks to add.
+
+1. The first task is to Sync the files in the Artifact with your static website container in the Azure Storage account specified. Click the **+** to add a new task.
+
+![create-release-pipeline4](/assets/images/2020-10-25/create-release-pipeline4.png)
+
+Add an `Azure CLI` task.
+
+![create-release-pipeline5](/assets/images/2020-10-25/create-release-pipeline5.png)
+
+ Configure the task:
+ - Update **Display name** to **Sync files**
+ - Set **Azure Resource Manager connection**
+ - Set **Script Type** to **Batch**
+ - Set **Script Location** to **Inline script**.
+ - Set the **Inline Script** to the following:
+
+```powershell
+az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --auth-mode key --account-key $(key)
+```
+
+Task example yaml:
 
 ```yaml
 # This code syncs with the storage blob you specify
 # It won't delete all files, then upload. It will 
 # upload only what is needed, and only delete what
-# is needed (less operations).
+# is needed.
 steps:
 - task: AzureCLI@1
   displayName: 'Sync files'
@@ -440,7 +307,24 @@ steps:
     workingDirectory: '$(System.DefaultWorkingDirectory)/_MyBlog'
 ```
 
-#### Purge CDN
+![create-release-pipeline6](/assets/images/2020-10-25/create-release-pipeline6.png)
+
+3. The second task is to Purge the CDN of all cached files so the new site is pulled and cached.
+
+Add another `Azure CLI` task.
+
+ Configure the task:
+ - Update **Display name** to **Purge CDN**
+ - Set **Azure Resource Manager connection**
+ - Set **Script Type** to **Batch**
+ - Set **Script Location** to **Inline script**.
+ - Set the **Inline Script** to the following:
+
+```powershell
+az cdn endpoint purge --profile-name $(cdnProfile) --content-paths /* --name $(endpointName) --resource-group $(resourceGroup)
+```
+
+Task example yaml:
 
 ```yaml
 # Purges the CDN's cache so it has to fetch new (updated)
@@ -449,105 +333,217 @@ steps:
 - task: AzureCLI@1
   displayName: 'Purge CDN'
   inputs:
-    azureSubscription: 'Visual Studio Professional (3a69699e-acaf-48c5-a4a3-d506bb04d4a6)'
+    azureSubscription: '$(subscription)'
     scriptLocation: inlineScript
     inlineScript: 'az cdn endpoint purge --profile-name $(cdnProfile) --content-paths /* --name $(endpointName) --resource-group $(resourceGroup)'
 ```
 
+### Add variables
 
----
+Both of our tasks use multiple variables we need to define. While still editing Release, click **Variables**.
+
+Add the following variables:
+
+**Sync files**
+
+*source*: Folder name in the artifact that contains the site, `_site` for Jekyll
+
+*containerName*:  $web (set by Azure)
+
+*storageAccount*:  The name of your storage account
+
+*key*: Access key to your storage account
+
+**Purge CDN**
+
+*cdnProfile*: The name of the CDN Profile used by the Endpoint resource
+
+*endpointName*: The name of the Endpoint
+
+*resourceGroup*: The name of the Resource Group that contains the Endpoint
+
+![create-release-pipeline7](/assets/images/2020-10-25/create-release-pipeline7.png)
+
+**Make sure to Save your pipeline**
+
+### Create a release
+
+In the top right next to the Save button you just clicked, click **Create release**, after the dialog shows, click **Create**.
+
+This process may take a few minutes. Once complete, open a browser and navigate to the storage accounts `Primary endpoint` you wrote down previously. You can also access the site via the CDN endpoint we created. The site will be `https://endpointname.azureedge.net`.
+
+**Your site should now be deployed! Horray!**
 
 
-### Appendix B: References
-
-Here are some other developer blog posts that helped me complete this project.
-
-- [https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/](https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/)
-- [https://www.glennprince.com/article/moving-my-site-onto-a-cdn/](https://www.glennprince.com/article/moving-my-site-onto-a-cdn/)
-- [https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version](https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version)
 
 
----
+## Setup custom domain
 
----
+### Add DNS records to domain
 
----
+In order to setup our custom domains Azure needs to verify you own the domain so we need to setup some CNAME records that Azure can verify.
 
----
+Go to your domain providers DNS management page.
 
----
+Add a CNAME with **Host** `cdnverify.www` and **Value** `cdnverify.endpointname.azureedge.net`.
 
----
+Add a CNAME with **Host** `www` and **Value** `endpointname.azureedge.net`.
 
----
+I'm using GoDaddy for my domains.
 
----
+![cname-records](/assets/images/2020-10-25/cname-records.png)
 
----
+### Add custom domain to the CDN endpoint
 
----
+Navigate to the Azure CDN Endpoint resource.
 
----
+Navigate to **Settings** > **Custom domains** > **+ Custom domain**
 
----
+![add-custom-domain-to-endpoint](/assets/images/2020-10-25/add-custom-domain-to-endpoint.png)
 
----
+Fill in your `www` subdomain. If Azure is able to verify your CNAME record you will see the green check, otherwise there will be a red X.
 
----
+![add-a-custom-domain](/assets/images/2020-10-25/add-a-custom-domain.png)
 
----
+Now we need to enable HTTPS for the hostname.
 
----
+Click your custom domain.
 
----
+![endpoint-custom-domains](/assets/images/2020-10-25/endpoint-custom-domains.png)
 
----
+Set **Custom domain HTTPS** to **On**.
 
-Now we want to utilize Azure CDN to cache the static site so it is fast & secure for viewers.
+I am using Azure's free certificates so I set **Certificate management type** to **CDN managed**.
+
+Then click **Save**.
+
+![enable-custom-domain-https](/assets/images/2020-10-25/enable-custom-domain-https.png)
+
+In my experience, the certificate deployment process can take 6-8 hours to complete.
+
+Once complete, the screen should look like the below.
+
+![https-successfully-enabled](/assets/images/2020-10-25/https-successfully-enabled.png)
 
 >**IMPORTANT**  
->I was able to get my apex domain added as a custom domain to my Azure CDN endpoint, but Azure no longer supports using their free SSL certificates for apex domains. I can't purchase one because it would blow my yearly budget. The option I came up with involves setting up Azure CDN using the `www` subdomain and then forwarding requests to the apex domain to the www subdomain. While I personally dislike having to use the `www` subdomain at all, it is providing me a free SSL certificate.
+>I was able to get my apex domain added as a custom domain to my Azure CDN endpoint, but Azure no longer supports using their free SSL certificates for apex domains. The solution I decided on involves setting up Azure CDN using the `www` subdomain and then forwarding requests to the apex domain to the www subdomain. While I personally dislike having to use the `www` subdomain at all, it is providing me a free SSL certificate.
+
+Here is the error I got trying to add an endpoint for the apex domain.
 
 ![azure-cdn-apex-https-fail](/assets/images/2020-10-25/azure-cdn-apex-https-fail.png)
 
 
----
 
 
-## Setup special HTTP rules for the CDN endpoint
+## Setup HTTP rules for the CDN endpoint
 
-Change text to lowercase.
+There are some HTTP rules we want to set up to provide for better security and a better experience.
 
-![Screenshot](/assets/images/2020-10-25/change-to-lowercase.png)
+Navigate to your **CDN profile** resource and click **Manage**.
 
+![Screenshot](/assets/images/2020-10-25/cdnprofile-manage.png)
 
-HSTS Header
+Then go to **HTTP Large** > **Rules Engine V4.0**.
 
-![Screenshot](/assets/images/2020-10-25/hsts-header.png)
+I won't go into detail on how to setup policys, as you can check the [documentation](https://docs.vdms.com/cdn/).
 
-HTTP to HTTPS Redirect
+We will prefix the **Source** to `/80` since we are using a custom domain. [Here are the docs.](https://docs.vdms.com/cdn/Content/HTTP_and_HTTPS_Data_Delivery/Accessing_Your_Content.htm#CAP) The next 5 characters is your account id. It should be in the top right corner in parenthesis of the CDN management page. The next part of the source is your CDN endpoint's name.
 
-![Screenshot](/assets/images/2020-10-25/http-to-https-redirect.png)
+### Redirect HTTP to HTTPS
 
-Redirect Root to WWW
+Any request to `http` will be redirected to use `https`.
 
-**DID NOT WORK FOR ME**
+Add a new rule.
 
-This wasn't working for me. I had to use GoDaddy to forward the domain to the www subdomain, which was mapped to the Azure CDN endpoint.
+If `Request` `Request Scheme` matches `http`.
 
-![Screenshot](/assets/images/2020-10-25/redirect-root-to-www.png)
+Add feature.
+
+- **Feature** `URL` `URL Redirect`
+- **Source** `/80{act}/{endpoint-name}/(.*)`
+- **Destination** `https://www.alexoswald.com/$1`
+- **Code** `301`
+
+![http-https](/assets/images/2020-10-25/http-https.png)
+
+### Caching
+
+Cache content for 1 year on the server and 1 day on the client. Each time I update the site I purge the CDN, so I want the internal cache to be longer than the longest potential time between blog posts.
+
+Add a new rule.
+
+If `General` `Always`.
+
+Add feature.
+
+- **Feature** `Caching` `Default Internal Max-Age`
+- **Status** `200`
+- **Value** `525600`
+- **Units** `minutes`
+
+Add feature.
+
+- **Feature** `Caching` `External Max-Age`
+- **Value** `86400`
+- **Units** `seconds`
+
+### HSTS Header
+
+Instructs the browser to forward to `https` if needed.
+
+Add a new rule.
+
+If `General` `Always`.
+
+Add feature.
+
+- **Feature** `Headers` `Modify Client Response Header`
+- **Action** `Append`
+- **Name** `Strict-Transport-Security`
+- **Value** `max-age=31536000; includeSubDomains`
+
+### Redirect Root to WWW
+
+>**NOTE**
+>
+>Since we are not able to add the free certificate to an endpoint with a custom domain that is an apex domain, we didn't setup an endpoint for the apex domain. Therefore, we are not able to use HTTP Rules to redirect from root to www. Some other blogs I read did this, but it must of been before they disabled certificates for apex domains, or they purchased their own certificate. Since I am using GoDaddy, I will use their DNS management to forward root domain requests to `www.alexoswald.com`. This forwards `http://alexoswald.com` and `https://alexoswald.com` to `https://alexoswald.com`.
 
 ![godaddy-domain-forwarding](/assets/images/2020-10-25/godaddy-domain-forwarding.png)
 
----
+### Other headers
+
+I think it is important to add other security headers so I've made sure to have at least an `A` rating on [Securityheaders.com](https://securityheaders.com/?q=alexoswald.com&followRedirects=on). I suggest following the suggestions there to add other headers and improve your security.
 
 
-### Appendix A: Site urls
 
-http://alexoswald.com - Redirected to Origin with GoDaddy domain forwarding
 
-https://alexoswald.com - 
+## References
 
-http://www.alexoswald.com - Redirected to Origin with CDN HTTP rule
+Here are some other developer blog posts that helped me complete this project. 
 
-https://www.alexoswald.com - Origin
+- Arlan Nugara's blog helped me add the apex domain to the CDN, though I couldn't use it because I can't get the free certificate.
+  
+  [https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/](https://arlanblogs.alvarnet.com/adding-a-root-domain-to-azure-cdn-endpoint/)
+
+- Glenn Price's blog helped me because at first my site wasn't being served, and it turned out to be because I had forgot to set the `Index document name` and `Error document path` in the static site setup.
+
+  [https://www.glennprince.com/article/moving-my-site-onto-a-cdn/](https://www.glennprince.com/article/moving-my-site-onto-a-cdn/)
+
+- Duncan Mackenzie's blog helped me understand how to add security headers and why the order matters.
+
+  [https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version](https://www.duncanmackenzie.net/blog/azure-cdn-rules/#redirecting-the-root-domain-to-the-www-version)
+
+- This is a great site that lets you check your HTTP headers and rates your sites security. The author, Scott Helme has some great blog posts on headers as well.
+
+  [https://securityheaders.com/](https://securityheaders.com/)
+
+
+
+
+## Thank you
+
+I hope you enjoyed my first post. I learned a lot reading other developers blogs and documentation so I hope you did too.
+
+If you have any comments, please feel free to email me at [alex@oswaldtechnologies.com](mailto:alex@oswaldtechnologies.com).
+
+-Alex
