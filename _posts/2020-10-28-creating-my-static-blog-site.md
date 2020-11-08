@@ -285,6 +285,9 @@ Add an `Azure CLI` task.
  - Set **Script Type** to **Batch**
  - Set **Script Location** to **Inline script**.
  - Set the **Inline Script** to the following:
+ - Set the **Working Directory**. Click the **...** button and select the build folder.
+
+ ![purge-set-working-directory](/assets/images/2020-10-28/purge-set-working-directory.png)
 
 ```powershell
 az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --auth-mode key --account-key $(key)
