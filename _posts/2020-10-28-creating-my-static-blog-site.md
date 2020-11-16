@@ -1,9 +1,9 @@
 ---
 title: "Creating a Static Blog with Jekyll, Dev Containers & Azure CDN!"
+author: "Alex Oswald"
 date: 2020-10-28
 toc: true
-toc_label: 'Outline'
-toc_icon: list-alt
+toc_label: 'Table of Contents'
 toc_sticky: true
 ---
 
