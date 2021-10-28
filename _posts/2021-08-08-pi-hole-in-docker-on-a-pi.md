@@ -252,6 +252,34 @@ Once devices start requiring IP addresses from Pi-Hole's DHCP server, Pi-Hole wi
 ![pihole-3](/assets/images/2021-08-08/pihole-3.png)
 
 
+## Troubleshooting
+
+I was having an issue where my pihole device would loose its DHCP reservartion after 24 hours and the device wouldn't assign itself a static IP so it would get assigned a random IP which caused DNS to stop working on the network and everything connected to break. The Raspberry Pi running pihole may need some additional configuration to make sure it assigns itself with the same static IP. To do this, edit `dhcpcd.conf` with the following command:
+
+```
+sudo nano /etc/dhcpcd.conf
+```
+
+Add the following:
+
+```
+# It is possible to fall back to a static IP if DHCP fails:
+# define static profile
+profile static_eth0
+static ip_address=10.10.10.2/24
+static routers=10.10.10.1
+static domain_name_servers=10.10.10.1
+
+# fallback to static profile on eth0
+interface eth0
+fallback static_eth0
+```
+
+Where 10.10.10.1 is the routers IP address, and 10.10.10.2 is Pi-Holes IP address.
+
+>If you are using the wireless interface `wlan0`, replace instances of `eth0` with `wlan0`. Don't forget to check your compose file, `DNSMASQ_LISTENING` should be set to the interface you are using or set to `all`.
+
+
 ## Thank you
 
 Check out my home infrastructure repo to see what I'm running!
