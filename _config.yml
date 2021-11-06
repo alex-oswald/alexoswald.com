@@ -16,6 +16,9 @@ minimal_mistakes_skin: "dark"
 search: true
 search_full_content: true
 
+disquis:
+  shortname: aoswaldblog
+
 include: ["_pages"]
 
 exclude:
@@ -30,6 +33,7 @@ defaults:
     values:
       layout: post
       author_profile: true
+      comments: true
   # _pages
   - scope:
       path: ""
