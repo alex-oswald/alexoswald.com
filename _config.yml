@@ -1,7 +1,7 @@
 encoding: utf-8
 locale: en-US
-title: Alex Oswald
-subtitle: Engineering Blog
+title: Alex's Engineering Blog
+subtitle: All things technical
 email: alex@oswaldtechnologies.com
 description:
 url: "https://www.alexoswald.com"
@@ -45,7 +45,7 @@ defaults:
 author:
   name: "Alex Oswald"
   avatar: "/assets/images/default-profile.png"
-  bio: "Software/Electrical Engineer"
+  bio: "Engineer"
   location: "Greater Seattle Area, WA"
   links:
     - label: "GitHub"
