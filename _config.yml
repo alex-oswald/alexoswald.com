@@ -44,7 +44,7 @@ defaults:
 
 author:
   name: "Alex Oswald"
-  avatar: "/assets/images/default-profile.png"
+  avatar: "/assets/images/avatar.jpg"
   bio: "Engineer"
   location: "Greater Seattle Area, WA"
   links:
