@@ -290,7 +290,7 @@ Add an `Azure CLI` task.
  ![purge-set-working-directory](/assets/images/2020-10-28/purge-set-working-directory.png)
 
 ```powershell
-az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --auth-mode key --account-key $(key)
+az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --account-key $(key)
 ```
 
 Task example yaml:
@@ -306,7 +306,7 @@ steps:
   inputs:
     azureSubscription: '$(subscription)'
     scriptLocation: inlineScript
-    inlineScript: 'az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --auth-mode key --account-key $(key)'
+    inlineScript: 'az storage blob sync --source $(source) --container $(containerName) --account-name $(storageAccount) --account-key $(key)'
     workingDirectory: '$(System.DefaultWorkingDirectory)/_MyBlog'
 ```
 
@@ -542,3 +542,10 @@ I hope you enjoyed my first post. I learned a lot reading other developers blogs
 If you have any comments, please feel free to email me at [alex@oswaldtechnologies.com](mailto:alex@oswaldtechnologies.com).
 
 -Alex
+
+
+## Updates
+
+**2022-08-06**
+
+- `az storage blob sync` no longer requires the argument `--auth-mode key`
