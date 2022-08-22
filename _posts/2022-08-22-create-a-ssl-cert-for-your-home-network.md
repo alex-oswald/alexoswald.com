@@ -4,7 +4,7 @@ author: "Alex Oswald"
 date: 2022-08-22
 ---
 
-In this post I will explain how to create an SSL certificate for your home network and how to install the root cert onto your computers so your browsers trust it.
+In this post I will explain how to create a SSL certificate for your home network and how to install the root cert onto your computers so your browsers trust it.
 
 
 # Why?
@@ -86,7 +86,7 @@ DNS.1 = *.pi.lan
 DNS.2 = pi.lan
 ```
 
-Create a text file named 'sslcert.csr.cnf' with the below contents. Update the properties in the `dn` section with your values.
+Create a text file named `sslcert.csr.cnf` with the below contents. Update the properties in the `dn` section with your values.
 
 ```
 [req]
@@ -226,7 +226,7 @@ If you picked a validity period above 398 days, you will not see the cert in **C
 
 In this post I explained how to create your own root CA and create an SSL certificate from that. I explained how to install the certificate on Windows, Linux and iOS. With these instructions, you can use HTTPS for web services running locally through a reverse proxy. Here's some iOS screenshots of some apps I'm doing this with.
 
-Most code and configuration for these are stored in my [HomeInfrao](https://github.com/alex-oswald/HomeInfra) repo on GitHub.
+Most code and configuration for these are stored in my [HomeInfra](https://github.com/alex-oswald/HomeInfra) repo on GitHub.
 
 ![heimdall](/assets/images/2022-08-22/heimdall.png)
 ![traefik](/assets/images/2022-08-22/traefik.png)
