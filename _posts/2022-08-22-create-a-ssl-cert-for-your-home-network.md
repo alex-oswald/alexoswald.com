@@ -205,9 +205,9 @@ You will then need to manually trust the certificate in the browsers you use sin
 
 ## iOS
 
-Transfer the `crt` file to your phone.
+Transfer the `pem` file to your phone.
 
-Open the `crt` file in the **Files** app and choose to install on the iPhone (if you have a watch there will be an option to install on the watch as well).
+Open the `pem` file in the **Files** app and choose to install on the iPhone (if you have a watch there will be an option to install on the watch as well).
 
 Go to **Settings > General > VPN & Device Management**
 
