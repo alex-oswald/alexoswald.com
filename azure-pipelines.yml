@@ -9,6 +9,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- checkout: self
+  lfs: true
+
 - task: UseRubyVersion@0
   displayName: 'Use Ruby >= 3.0'
   inputs:
