@@ -32,6 +32,7 @@ defaults:
       type: posts
     values:
       layout: post
+      classes: wide
       author_profile: true
       comments: true
   # _pages
@@ -40,6 +41,7 @@ defaults:
       type: pages
     values:
       layout: single
+      classes: wide
       author_profile: true
 
 author:
