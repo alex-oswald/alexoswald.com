@@ -1,5 +1,5 @@
 ---
-title: "Running a Cloudfare DDNS service for your home VPN"
+title: "Running a Cloudflare DDNS service for your home VPN"
 author: "Alex Oswald"
 date: 2023-02-20
 ---
@@ -27,11 +27,11 @@ a simples solution to the problem instead of finding another solution online. Wh
 exactly what I wanted, and I wouldn't of learned as much. So here we are...
 
 
-## What is CloudfareDDNS
+## What is CloudflareDDNS
 
 See the CloudflareDDNS repository on github: [https://github.com/alex-oswald/CloudflareDDNS](https://github.com/alex-oswald/CloudflareDDNS)
 
-CloudfareDDNS is a .NET application that runs in a container. It creates a background service that runs a few commands on an interval,
+CloudflareDDNS is a .NET application that runs in a container. It creates a background service that runs a few commands on an interval,
 defaulting to every 15 minutes. You can run it locally on any machine. I run mine as a stack on a Raspberry Pi swarm since setup is
 simple with [Portainer](https://www.portainer.io/).
 
