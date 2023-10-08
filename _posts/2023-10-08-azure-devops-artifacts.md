@@ -94,7 +94,7 @@ Now we can hit [Aritfacts - Get File](https://learn.microsoft.com/en-us/rest/api
 **Request**
 
 ```
-https://dev.azure.com/{{organization}}/{{project}}/_apis/build/builds/703/artifacts?artifactName=TestArtifact&fileId=D21C967E56201F344B44EE00F537263C3503AEB13931F99754F9E78E14E6C90C01&fileName=test1.txt
+https://dev.azure.com/oswaldtechnologies/add3132d-b1ce-4519-8299-4e67eecad1f5/_apis/build/builds/703/artifacts?artifactName=TestArtifact&fileId=D21C967E56201F344B44EE00F537263C3503AEB13931F99754F9E78E14E6C90C01&fileName=test1.txt
 ```
 
 **Response**
