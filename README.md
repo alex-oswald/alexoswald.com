@@ -1,6 +1,12 @@
 # My Engineering Blog
 
-My blog published as an Azure Static Web App.
+## Stack
+
+[Jekyll](https://jekyllrb.com/)
+[Minimal Mistakes](https://mademistakes.com/work/jekyll-themes/minimal-mistakes/)
+[Giscus](https://giscus.app/)
+
+Azure Static Web App
 
 ## Building
 
@@ -12,7 +18,7 @@ In VSCode run the `Production Build` task.
 bundle exec jekyll build
 ```
 
-# Development
+## Development
 
 In VSCode run the `Development (livereload/drafts)` task.
 
