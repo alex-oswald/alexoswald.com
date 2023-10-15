@@ -1,32 +1,43 @@
 
-baseURL: 'https://alexoswald.com/'
+#baseURL: 'https://alexoswald.com/'
 languageCode: 'en-us'
 title: 'Alexs Engineering Blog'
+
+enableRobotsTXT: true
 
 # import hextra as module
 module:
   imports:
-  - path: github.com/imfing/hextra
+  - path: hextra
+  - path: giscus
 
-# menu:
-#   main:
-#     - name: Docs
-#       pageRef: /docs
-#       weight: 1
-#     - name: About
-#       pageRef: /about
-#       weight: 2
-#     - name: Search
-#       weight: 3
-#       params:
-#         type: search
-#     - name: GitHub
-#       weight: 4
-#       url: "https://github.com/alex-oswald"
-#       params:
-#         icon: github
-#     - name: LinkedIn
-#       weight: 4
-#       url: "https://www.linkedin.com/in/alex-oswald-9b207157/"
-#       params:
-#         icon: linkedin
+menu:
+  main:
+    - name: Blog
+      pageRef: /blog
+      weight: 1
+    - name: About
+      pageRef: /about
+      weight: 2
+    - name: Search
+      weight: 3
+      params:
+        type: search
+    - name: GitHub
+      weight: 4
+      url: "https://github.com/alex-oswald"
+      params:
+        icon: github
+    - name: LinkedIn
+      weight: 4
+      url: "https://www.linkedin.com/in/alex-oswald-9b207157/"
+      params:
+        icon: github
+
+params:
+  giscus:
+    endpoint: https://giscus.app/
+    repo: "alex-oswald/blog"
+    repo_id: "R_kgDOGSe--w"
+    category: "Announcements"
+    category_id: "DIC_kwDOGSe--84CaHp6"

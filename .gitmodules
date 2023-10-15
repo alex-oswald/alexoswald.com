@@ -1,3 +1,5 @@
 [submodule "themes/hextra"]
 	path = themes/hextra
 	url = https://github.com/imfing/hextra.git
+[submodule "themes/giscus"]
+	path = https://github.com/hugomods/giscus
