@@ -4,7 +4,6 @@ slug: 2022-pc-build
 aliases:
 - /2022/08/04/pc-build.html
 author: "Alex Oswald"
-date: 2022-08-04
 ---
 
 

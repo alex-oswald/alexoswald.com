@@ -3,7 +3,6 @@ title: "Dynamically creating an IMG file with a FAT32 partition"
 slug: dynamically-creating-an-img-file-with-a-fat32-partition
 aliases:
 - /2023/10/27/dynamically-creating-img-file-with-fat32-partition.html
-author: "Alex Oswald"
 date: 2023-10-27
 ---
 

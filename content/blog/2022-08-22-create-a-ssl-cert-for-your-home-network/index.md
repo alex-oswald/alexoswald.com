@@ -3,7 +3,6 @@ title: "Create a SSL certificate for your home network"
 slug: create-a-ssl-certificate-for-your-home-network
 aliases:
 - /2022/08/22/create-a-ssl-cert-for-your-home-network.html
-author: "Alex Oswald"
 date: 2022-08-22
 ---
 
