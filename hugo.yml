@@ -8,8 +8,8 @@ enableRobotsTXT: true
 # import hextra as module
 module:
   imports:
-  - path: hextra
-  - path: giscus
+  - path: github.com/imfing/hextra
+  - path: github.com/giscus/giscus
 
 menu:
   main:
@@ -35,9 +35,10 @@ menu:
         icon: github
 
 params:
-  giscus:
-    endpoint: https://giscus.app/
-    repo: "alex-oswald/blog"
-    repo_id: "R_kgDOGSe--w"
-    category: "Announcements"
-    category_id: "DIC_kwDOGSe--84CaHp6"
+  blog:
+    giscus:
+      endpoint: https://giscus.app/
+      repo: "alex-oswald/blog"
+      repo_id: "R_kgDOGSe--w"
+      category: "Announcements"
+      category_id: "DIC_kwDOGSe--84CaHp6"

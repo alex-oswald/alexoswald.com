@@ -107,4 +107,4 @@ And there you have it! Figuring out how to do this was important for a project I
 
 Give credit where credit is due. I found the solution to this problem via this [GitHub issues comment](https://github.com/MicrosoftDocs/vsts-rest-api-specs/issues/381#issuecomment-1612877259).
 
-{{ partial "giscus/script" . }}
+{{ partial "giscus/script-with-options" .Site.Params.blog.giscus }}
