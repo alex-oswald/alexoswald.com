@@ -1,5 +1,8 @@
 ---
 title: "Running a Cloudflare DDNS service for your home VPN"
+slug: cloudflare-ddns-service-for-your-home-vpn
+aliases:
+- /2023/02/20/cloudflare-ddns.html
 author: "Alex Oswald"
 date: 2023-02-20
 ---

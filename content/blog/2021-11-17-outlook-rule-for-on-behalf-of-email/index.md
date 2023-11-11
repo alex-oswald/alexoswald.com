@@ -1,5 +1,8 @@
 ---
 title: "Outlook Rule for 'on behalf of' Emails"
+slug: outlook-rule-for-on-behalf-of-emails
+aliases:
+- /2021/11/17/outlook-rule-for-on-behalf-of-email.html
 author: "Alex Oswald"
 date: 2021-11-17
 ---

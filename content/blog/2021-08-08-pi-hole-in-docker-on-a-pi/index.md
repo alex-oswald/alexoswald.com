@@ -1,5 +1,8 @@
 ---
 title: "Pi-Hole in Docker on a Raspberry Pi"
+slug: pi-hole-in-docker-on-a-raspberry-pi
+aliases:
+- /2021/08/08/pi-hole-in-docker-on-a-pi.html
 author: "Alex Oswald"
 date: 2021-08-08
 ---

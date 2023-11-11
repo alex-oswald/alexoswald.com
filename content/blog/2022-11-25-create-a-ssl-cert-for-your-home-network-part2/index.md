@@ -1,5 +1,8 @@
 ---
 title: "Create a SSL certificate for your home network Part 2"
+slug: create-a-ssl-certificate-for-your-home-network-part-2
+aliases:
+- /2022/11/25/create-a-ssl-cert-for-your-home-network-part2.html
 author: "Alex Oswald"
 date: 2022-11-25
 ---

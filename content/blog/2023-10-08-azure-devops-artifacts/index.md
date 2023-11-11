@@ -1,5 +1,8 @@
 ---
 title: "Downloading individual files from an Azure DevOps pipeline artifact using the REST API"
+slug: downloading-individual-files-from-an-azure-devops-pipeline-artifact-using-the-rest-api
+aliases:
+- /2023/10/07/azure-devops-artifacts.html
 author: "Alex Oswald"
 date: 2023-10-07
 ---

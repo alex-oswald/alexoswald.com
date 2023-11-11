@@ -1,5 +1,8 @@
 ---
 title: "Creating a Static Blog with Jekyll, Dev Containers & Azure CDN!"
+slug: creating-a-static-blog-with-jekyll-dev-containers-and-azure-cdn
+aliases:
+- /2020/10/28/creating-my-static-blog-site.html
 author: "Alex Oswald"
 date: 2020-10-28
 ---

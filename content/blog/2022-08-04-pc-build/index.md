@@ -1,8 +1,12 @@
 ---
 title: "2022 Development/Gaming PC Build"
+slug: 2022-pc-build
+aliases:
+- /2022/08/04/pc-build.html
 author: "Alex Oswald"
 date: 2022-08-04
 ---
+
 
 
 ## It's time to build a beast of a development/gaming desktop PC in 2022!

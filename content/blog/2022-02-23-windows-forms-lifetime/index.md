@@ -1,5 +1,8 @@
 ---
 title: "Windows Forms Lifetime"
+slug: windows-forms-lifetime
+aliases:
+- /2022/02/23/windows-forms-lifetime.html
 author: "Alex Oswald"
 date: 2022-02-23
 ---
