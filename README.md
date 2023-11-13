@@ -2,11 +2,12 @@
 
 ## Stack
 
-[Jekyll](https://jekyllrb.com/)
-[Minimal Mistakes](https://mademistakes.com/work/jekyll-themes/minimal-mistakes/)
-[Giscus](https://giscus.app/)
-
-Azure Static Web App
+| Layer | Tech |
+|-|-
+| Static site generator | [Hugo](https://jekyllrb.com/) |
+| Theme | [Hextra](https://github.com/imfing/hextra) |
+| Comments | [Giscus](https://giscus.app/) |
+| Hosting provider | [Azure Static Web Apps](https://learn.microsoft.com/en-us/azure/static-web-apps/) |
 
 ## Building
 
