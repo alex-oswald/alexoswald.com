@@ -34,18 +34,15 @@ menu:
       params:
         icon: linkedin
 
-contentDir: content/blog
-
 params:
   comments:
     enable: true
     type: "giscus"
     giscus:
-      endpoint: https://giscus.app/
       repo: "alex-oswald/blog"
-      repo_id: "R_kgDOGSe--w"
+      repoId: "R_kgDOGSe--w"
       category: "Announcements"
-      category_id: "DIC_kwDOGSe--84CaHp6"
+      categoryId: "DIC_kwDOGSe--84CaHp6"
       mapping: "title"
       strict: 1
   footer:
