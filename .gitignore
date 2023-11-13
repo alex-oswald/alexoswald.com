@@ -1,2 +1,4 @@
 WORKSPACE
 public
+
+.hugo_build.lock
