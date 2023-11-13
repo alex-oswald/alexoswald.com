@@ -108,5 +108,3 @@ Test string 1
 And there you have it! Figuring out how to do this was important for a project I was working on. I needed to download a small json file from artifacts that were over 10GB in size. It would be silly to download the whole artifact just to extract a small json file from it.
 
 Give credit where credit is due. I found the solution to this problem via this [GitHub issues comment](https://github.com/MicrosoftDocs/vsts-rest-api-specs/issues/381#issuecomment-1612877259).
-
-{{ partial "giscus/script-with-options" .Site.Params.blog.giscus }}
