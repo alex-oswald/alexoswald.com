@@ -4,7 +4,7 @@ comments: false
 toc: false
 ---
 
-![avatar](avatar.jpg)
+![avatar](avatar.png)
 
 I'm Alex, and I'm a Full Stack Software Engineer & Electrical Engineer. I'm a Software Engineer at Microsoft helping make Windows on ARM devices badass.
 
