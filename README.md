@@ -2,11 +2,12 @@
 
 ## Stack
 
-[Jekyll](https://jekyllrb.com/)
-[Minimal Mistakes](https://mademistakes.com/work/jekyll-themes/minimal-mistakes/)
-[Giscus](https://giscus.app/)
-
-Azure Static Web App
+| Layer | Tech |
+|-|-
+| Static site generator | [Hugo](https://jekyllrb.com/) |
+| Theme | [Hextra](https://github.com/imfing/hextra) |
+| Comments | [Giscus](https://giscus.app/) |
+| Hosting provider | [Azure Static Web Apps](https://learn.microsoft.com/en-us/azure/static-web-apps/) |
 
 ## Building
 
@@ -15,7 +16,7 @@ Azure Static Web App
 In VSCode run the `Production Build` task.
 
 ```
-bundle exec jekyll build
+hugo
 ```
 
 ## Development
@@ -23,7 +24,5 @@ bundle exec jekyll build
 In VSCode run the `Development (livereload/drafts)` task.
 
 ```
-bundle exec jekyll serve
+hugo server -D
 ```
-
-Open a browser and navigate to `localhost:4000`
