@@ -1,6 +1,6 @@
 #baseURL: 'https://alexoswald.com/'
 languageCode: 'en-us'
-title: 'Alex's Engineering Blog'
+title: "Alex's Engineering Blog"
 
 enableRobotsTXT: true
 
@@ -36,6 +36,5 @@ menu:
 params:
   comments:
     enable: true
-    type: "giscus"
   footer:
     displayCopyright: true
