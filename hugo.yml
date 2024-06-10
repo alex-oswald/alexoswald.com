@@ -36,5 +36,6 @@ menu:
 params:
   comments:
     enable: true
+    type: "giscus"
   footer:
     displayCopyright: true
