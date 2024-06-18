@@ -1,7 +1,6 @@
-
 #baseURL: 'https://alexoswald.com/'
 languageCode: 'en-us'
-title: 'Alexs Engineering Blog'
+title: "Alex's Engineering Blog"
 
 enableRobotsTXT: true
 
@@ -38,12 +37,5 @@ params:
   comments:
     enable: true
     type: "giscus"
-    giscus:
-      repo: "alex-oswald/blog"
-      repoId: "R_kgDOGSe--w"
-      category: "Announcements"
-      categoryId: "DIC_kwDOGSe--84CaHp6"
-      mapping: "title"
-      strict: 1
   footer:
     displayCopyright: true
