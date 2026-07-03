@@ -8,7 +8,6 @@ enableRobotsTXT: true
 module:
   imports:
   - path: github.com/imfing/hextra
-  - path: github.com/giscus/giscus
 
 menu:
   main:
@@ -37,5 +36,13 @@ params:
   comments:
     enable: true
     type: "giscus"
+    giscus:
+      repo: "alex-oswald/alexoswald.com"
+      repoId: "R_kgDOGSe--w"
+      category: "Announcements"
+      categoryId: "DIC_kwDOGSe--84CaHp7"
+      mapping: "title"
+      inputPosition: "bottom"
+      reactionsEnabled: 1
   footer:
     displayCopyright: true
