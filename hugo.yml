@@ -33,6 +33,10 @@ menu:
         icon: linkedin
 
 params:
+  navbar:
+    logo:
+      path: images/logo.svg
+      dark: images/logo-dark.svg
   comments:
     enable: true
     type: "giscus"
