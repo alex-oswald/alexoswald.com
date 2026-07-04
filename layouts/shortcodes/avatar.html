@@ -1,0 +1,9 @@
+{{- $src := .Get "src" | default "avatar.png" -}}
+{{- $alt := .Get "alt" | default "avatar" -}}
+{{- $img := .Page.Resources.GetMatch $src -}}
+{{- with $img -}}
+  {{- $avatar := .Fit "250x250" -}}
+  <img src="{{ $avatar.RelPermalink }}" width="{{ $avatar.Width }}" height="{{ $avatar.Height }}" alt="{{ $alt }}" loading="lazy" />
+{{- else -}}
+  {{- warnf "avatar shortcode: image %q not found as a resource of %q" $src $.Page.Path -}}
+{{- end -}}
