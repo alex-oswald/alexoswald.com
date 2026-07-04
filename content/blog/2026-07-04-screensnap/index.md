@@ -75,9 +75,8 @@ most PCs and an `arm64` MSI for ARM devices. The installer is self-contained (it
 Windows App SDK runtimes) and installs per-user, so there's no admin prompt and nothing else to
 install.
 
-Because the releases aren't code-signed yet, Windows SmartScreen will warn that the publisher is
-unverified — click **More info → Run anyway**. On Windows 11 with Smart App Control in Enforcement
-mode you may need to switch it to Evaluation or Off, or wait for a signed release.
+The installers are code-signed, so they install cleanly without any SmartScreen "unverified
+publisher" warnings.
 
 Once it's running, look for the ScreenSnap icon in the notification area (you may have to expand the
 tray overflow). To create your first preset:
