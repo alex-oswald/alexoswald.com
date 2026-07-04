@@ -10,6 +10,8 @@ I'm Alex, and I'm a Full Stack Software Engineer & Electrical Engineer. I'm a So
 
 Curious what I've been working on? Checkout Microsoft's new [Copilot+ PCs](https://www.microsoft.com/en-us/windows/copilot-plus-pcs) that I helped create!
 
+My team built a test framework that validates pre-release engineering hardware, making sure the drivers for new SoCs work well with Windows and deliver a great experience. We're validating AI workloads on Windows PCs and validating SoCs on Windows to power the future AI developer.
+
 Along with my day job, I run Oswald Technologies in my spare time. For 10 years from 2013 to October 2023 my business provided [TireDispatcher](https://tiredispatcher.com). TireDispatcher is Software as a Service (SaaS) that helps commercial tire companies keep track of their mobile services. Some customers included [GCR Tires & Service](https://www.gcrtires.com/), [Continental Tire](https://www.continentaltire.com/), [Les Schwab Tire Center](https://www.lesschwab.com/), [Kal Tire](https://www.kaltire.com/), [Conlan Tire](https://www.conlantire.com/), and [Best One Tire](https://www.bestonetire.com/).
 
 ### Education
