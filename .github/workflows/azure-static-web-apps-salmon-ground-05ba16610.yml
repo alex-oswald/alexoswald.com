@@ -20,10 +20,26 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          submodules: true
           lfs: true
+      # Build Hugo ourselves so we control the (extended) binary and Go toolchain.
+      # SWA's built-in Oryx build ships an incompatible Hugo that crashes with a
+      # GLIBC mismatch, so we prebuild and deploy with skip_app_build below.
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.117.0"
+          extended: true
+      - name: Build site
+        run: hugo --gc --minify
+        env:
+          HUGO_ENV: production
+          HUGO_ENVIRONMENT: production
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -31,11 +47,12 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_SALMON_GROUND_05BA16610 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "./" # App source code path
+          ###### Repository/Build Configurations ######
+          app_location: "public" # Pre-built Hugo output (see Build site step)
           api_location: "" # Api source code path - optional
-          output_location: "public" # Built app content directory - optional
+          output_location: "" # Already built; do not run Oryx
+          skip_app_build: true
+          skip_api_build: true
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:

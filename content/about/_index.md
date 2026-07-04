@@ -4,9 +4,7 @@ comments: false
 toc: false
 ---
 
-{{ $image := .Resources.Get "avatar.png" }}
-{{ $image := $image.Resize "250x250" }}
-<img src="{{ $image.RelPermalink }}" width="{{ $image.Width }}" height="{{ $image.Height }}">
+{{< avatar >}}
 
 I'm Alex, and I'm a Full Stack Software Engineer & Electrical Engineer. I'm a Software Engineer at Microsoft helping make Windows on ARM devices badass.
 
