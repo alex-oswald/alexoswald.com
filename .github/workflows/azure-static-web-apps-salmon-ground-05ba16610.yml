@@ -20,14 +20,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           lfs: true
       # Build Hugo ourselves so we control the (extended) binary and Go toolchain.
       # SWA's built-in Oryx build ships an incompatible Hugo that crashes with a
       # GLIBC mismatch, so we prebuild and deploy with skip_app_build below.
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: "1.22"
       - name: Setup Hugo
