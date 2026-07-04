@@ -1,5 +1,10 @@
 name: Azure Static Web Apps CI/CD
 
+# Deployment environments (single Static Web App: salmon-ground):
+#   - Push to main         -> deploys to the PRODUCTION environment
+#   - Pull request to main -> deploys to an automatic PREVIEW ("dev") environment
+#                             with its own URL, posted as a comment on the PR
+#   - Pull request closed  -> tears down that preview environment
 on:
   push:
     branches:
