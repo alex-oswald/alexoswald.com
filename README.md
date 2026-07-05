@@ -33,9 +33,8 @@ hugo server -D
 
 ## Deployments
 
-The site is hosted on a single [Azure Static Web App](https://learn.microsoft.com/en-us/azure/static-web-apps/) (`alexsblog`, whose default hostname slug is `salmon-ground`) and deployed by [`.github/workflows/azure-static-web-apps-salmon-ground-05ba16610.yml`](.github/workflows/azure-static-web-apps-salmon-ground-05ba16610.yml):
+The site is hosted on a single [Azure Static Web App](https://learn.microsoft.com/en-us/azure/static-web-apps/) (`salmon-ground`) and deployed by [`.github/workflows/azure-static-web-apps-salmon-ground-05ba16610.yml`](.github/workflows/azure-static-web-apps-salmon-ground-05ba16610.yml):
 
-- **Merge or push to `main`** → deploys to the production site.
-- **Push to `dev`** → deploys to a persistent `dev` preview environment with a stable URL. Every push to `dev` reuses the same environment, so it never adds a new staging environment (the Free plan caps these at three).
-- **Open or update a pull request against `main`** → deploys to a per-PR preview environment with its own URL, posted as a comment on the PR.
-- **Close the pull request** → that per-PR preview environment is torn down.
+- **Open or update a pull request against `main`** → deploys to an automatic preview ("dev") environment with its own URL, posted as a comment on the PR.
+- **Merge to `main`** → deploys to the production site.
+- **Close the pull request** → the preview environment is torn down.

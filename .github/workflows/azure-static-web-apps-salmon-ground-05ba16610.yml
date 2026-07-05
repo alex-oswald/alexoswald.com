@@ -1,19 +1,14 @@
 name: Azure Static Web Apps CI/CD
 
-# Deployment environments (single Static Web App: alexsblog / salmon-ground):
+# Deployment environments (single Static Web App: salmon-ground):
 #   - Push to main         -> deploys to the PRODUCTION environment
-#   - Push to dev          -> deploys to the persistent "dev" preview environment
-#                             (stable URL). Every push to dev reuses this same
-#                             environment, so it never adds a new staging env and
-#                             we stay within the Free plan's staging-environment cap.
-#   - Pull request to main -> deploys to a per-PR preview environment with its own
-#                             URL, posted as a comment on the PR
-#   - Pull request closed  -> tears down that per-PR preview environment
+#   - Pull request to main -> deploys to an automatic PREVIEW ("dev") environment
+#                             with its own URL, posted as a comment on the PR
+#   - Pull request closed  -> tears down that preview environment
 on:
   push:
     branches:
       - main
-      - dev
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
