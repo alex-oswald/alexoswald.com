@@ -33,8 +33,9 @@ hugo server -D
 
 ## Deployments
 
-The site is hosted on a single [Azure Static Web App](https://learn.microsoft.com/en-us/azure/static-web-apps/) (`salmon-ground`) and deployed by [`.github/workflows/azure-static-web-apps-salmon-ground-05ba16610.yml`](.github/workflows/azure-static-web-apps-salmon-ground-05ba16610.yml):
+The site is hosted on a single [Azure Static Web App](https://learn.microsoft.com/en-us/azure/static-web-apps/) (`alexsblog`, whose default hostname slug is `salmon-ground`) and deployed by [`.github/workflows/azure-static-web-apps-salmon-ground-05ba16610.yml`](.github/workflows/azure-static-web-apps-salmon-ground-05ba16610.yml):
 
-- **Open or update a pull request against `main`** → deploys to a single, shared preview environment named `dev` (stable URL), posted as a comment on the PR. Every PR reuses this one environment so we stay within the Free plan's staging-environment limit.
-- **Merge to `main`** → deploys to the production site.
-- **Close the pull request** → the close job runs, but the shared `dev` preview is intentionally persistent and reused by the next PR.
+- **Merge or push to `main`** → deploys to the production site.
+- **Push to `dev`** → deploys to a persistent `dev` preview environment with a stable URL. Every push to `dev` reuses the same environment, so it never adds a new staging environment (the Free plan caps these at three).
+- **Open or update a pull request against `main`** → deploys to a per-PR preview environment with its own URL, posted as a comment on the PR.
+- **Close the pull request** → that per-PR preview environment is torn down.

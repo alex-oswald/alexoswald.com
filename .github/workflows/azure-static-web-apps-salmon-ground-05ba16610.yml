@@ -1,17 +1,19 @@
 name: Azure Static Web Apps CI/CD
 
-# Deployment environments (single Static Web App: salmon-ground):
+# Deployment environments (single Static Web App: alexsblog / salmon-ground):
 #   - Push to main         -> deploys to the PRODUCTION environment
-#   - Pull request to main -> deploys to a single, shared preview environment
-#                             named "dev" (stable URL). Every PR reuses this one
-#                             environment (see deployment_environment below) so we
-#                             stay within the Free plan's staging-environment cap.
-#   - Pull request closed  -> the close job runs, but the shared "dev" preview is
-#                             intentionally persistent and reused by the next PR.
+#   - Push to dev          -> deploys to the persistent "dev" preview environment
+#                             (stable URL). Every push to dev reuses this same
+#                             environment, so it never adds a new staging env and
+#                             we stay within the Free plan's staging-environment cap.
+#   - Pull request to main -> deploys to a per-PR preview environment with its own
+#                             URL, posted as a comment on the PR
+#   - Pull request closed  -> tears down that per-PR preview environment
 on:
   push:
     branches:
       - main
+      - dev
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
@@ -50,12 +52,6 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_SALMON_GROUND_05BA16610 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
-          # Send every pull request preview to a single, stable "dev" environment
-          # instead of one per PR. The Free plan caps staging environments, so
-          # per-PR environments pile up and eventually fail with "maximum number
-          # of staging environments". On push to main this evaluates to an empty
-          # string, so production deploys as normal.
-          deployment_environment: ${{ github.event_name == 'pull_request' && 'dev' || '' }}
           ###### Repository/Build Configurations ######
           app_location: "public" # Pre-built Hugo output (see Build site step)
           api_location: "" # Api source code path - optional
